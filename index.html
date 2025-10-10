@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивные тесты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .module-selector {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .module-selector label {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 10px;
+        }
+
+        .module-selector select {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+            min-width: 250px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .question:hover {
+            transform: translateX(5px);
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .options {
+            margin-left: 10px;
+        }
+
+        .option {
+            margin: 10px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            width: calc(100% - 25px);
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Интерактивные тесты</h1>
+            <p>Выберите модуль и проверьте свои знания</p>
+        </div>
+
+        <div class="module-selector">
+            <label for="moduleSelect">Выберите модуль:</label>
+            <select id="moduleSelect" onchange="loadModule()">
+                <option value="1.1">1.1 Демократические изменения в обществе</option>
+                <option value="1.2">1.2 Правовые документы в образовании</option>
+                <option value="2.1">2.1 ИКТ в физической культуре</option>
+                <option value="2.2">2.2 Психология возрастных периодов</option>
+                <option value="2.3">2.3 Профессиональная компетентность педагога</option>
+                <option value="2.4">2.4 Морфофункциональные изменения школьников</option>
+                <option value="2.5">2.5 Безопасность жизнедеятельности</option>
+            </select>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="questionsContainer"></div>
+            <div class="buttons">
+                <button class="check-btn" onclick="checkAnswers()">Проверить ответы</button>
+                <button class="reset-btn" onclick="resetTest()">Сбросить</button>
+            </div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const testData = {
+            "1.1": [
+                {
+                    question: "2022−2026 yillarga mo'ljallangan Yangi O'zbekiston Taraqqiyot strategiyasining asosiy prinsipi qanday g'oyadan iborat?",
+                    options: ["Inson qadri uchun!", "Xalq manfaati uchun", "Rivojlanish uchun", "Taraqqiyot uchun"],
+                    correct: 0
+                },
+                {
+                    question: "O'zbekiston xalqi nomidan kim ish olib borishi mumkin?",
+                    options: ["Hukumat", "O'zbekiston xalqi saylagan Respublika Oliy Majlisi va Prezidenti", "Vazirlar", "Hokimlar"],
+                    correct: 1
+                },
+                {
+                    question: "O'zbekiston Respublikasi Davlat madhiyasi mualliflarini aniqlang.",
+                    options: ["A.Oripov, G.Gulom", "A.Oripov, M.Burhonov", "M.Burhonov, G.Gulom", "A.Aripov, M.Shayxov"],
+                    correct: 1
+                },
+                {
+                    question: "\"Xalq boy bo'lsa, davlat ham boy va .....\" jumlani to'ldiring.",
+                    options: ["Mustahkam bo'ladi", "Kuchli bo'ladi", "Qudratli bo'ladi", "Yaxshi bo'ladi"],
+                    correct: 2
+                },
+                {
+                    question: "Hozirda O'zbekistonda nechta siyosiy partiyalar faoliyat yuritmoqda?",
+                    options: ["3 ta", "4 ta", "5 ta", "6 ta"],
+                    correct: 2
+                }
+            ],
+            "1.2": [
+                {
+                    question: "Davlat ta'lim standartlariga to'g'ri ta'rif berilgan javobni belgilang.",
+                    options: ["Ta'lim mazmuni", "Davlat tomonidan ta'limning mazmuni va sifatiga nisbatan belgilanadigan talablar majmui", "O'quv dasturlari", "Darsliklar"],
+                    correct: 1
+                },
+                {
+                    question: "Sport maktablari qanday ta'lim turini amalga oshiradi?",
+                    options: ["Umumiy ta'lim", "Maxsus ta'lim", "Maktabdan tashqari ta'lim", "Oliy ta'lim"],
+                    correct: 2
+                },
+                {
+                    question: "O'zbekiston Respublikasi Prezidenti qanday normativ-huquqiy hujjatlar qabul qiladi?",
+                    options: ["Farmonlar va qarorlar", "Faqat farmonlar", "Faqat qarorlar", "Qonunlar"],
+                    correct: 0
+                },
+                {
+                    question: "Qonun bu-….",
+                    options: ["Hujjat", "O'zbekiston Respublikasida eng muhim va barqaror ijtimoiy munosabatlarni tartibga soladigan masalalar bo'yicha qabul qilinadigan oliy yuridik kuchga ega bo'lgan normative-huquqiy hujjat", "Farmon", "Qaror"],
+                    correct: 1
+                },
+                {
+                    question: "Umumta'lim maktablarida sinfdan tashqari sport to'garaklari va seksiyalari mashg'ulotlarini tashkil etish haftasiga necha soatni tashkil qilishi belgilangan?",
+                    options: ["Kamida 2 soat", "Kamida 3 soat", "Kamida 4 soat", "Kamida 5 soat"],
+                    correct: 2
+                }
+            ],
+            "2.1": [
+                {
+                    question: "Prezident tomonidan ilgari surilgan beshta muhim tashabbusning uchinchi qanday nomlangan?",
+                    options: ["Sport rivojlanishiga", "Aholi va yoshlar o'rtasida kompyuter texnologiyalari va internetdan samarali foydalanishni tashkil etishga qaratilgan", "Ta'lim sifatini oshirishga", "Madaniyatni rivojlantirishga"],
+                    correct: 1
+                },
+                {
+                    question: "Microsoft PowerPoint – bu qanday dastur?",
+                    options: ["Matn muharriri", "Taqdimot muharriri", "Elektron jadval", "Ma'lumotlar bazasi"],
+                    correct: 1
+                },
+                {
+                    question: "O'zbekiston Respublikasining domen zonasini aniqlang.",
+                    options: [".uz", ".com", ".ru", ".org"],
+                    correct: 0
+                },
+                {
+                    question: "Microsoft Excel – bu qanday dastur?",
+                    options: ["Matn muharriri", "Taqdimot muharriri", "Elektron jadvallar bilan ishlash dasturi", "Grafik muharriri"],
+                    correct: 2
+                },
+                {
+                    question: "Brauzer – bu qanday dastur hisoblanadi?",
+                    options: ["Fayl menejeri", "Internetda ma'lumotlarni izlab topish, ko'rish va qabul qilishni yengillashtiruvchi dastur", "Antivirus dastur", "Arxivator"],
+                    correct: 1
+                }
+            ],
+            "2.2": [
+                {
+                    question: "Turli yosh davrlari psixik taraqqiyotining umumiy qonuniyatlarini o'rganuvchi fan qaysi javobda to'g'ri berilgan?",
+                    options: ["Pedagogika", "Yosh davrlar psixologiyasi", "Fiziologiya", "Anatomiya"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yoshidagi bolalar aynan necha yoshga to'g'ri keladi?",
+                    options: ["5-9 yosh", "6-10 yosh", "7-11 yosh", "8-12 yosh"],
+                    correct: 2
+                },
+                {
+                    question: "O'smirlik davri necha yoshlarga to'g'ri keladi?",
+                    options: ["9-14 yoshlarga", "10-15 yoshlarga", "11-16 yoshlarga", "12-17 yoshlarga"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yoshi davrida qaysi faoliyat yetakchi hisoblanadi?",
+                    options: ["O'yin faoliyati", "O'qish faoliyati", "Mehnat faoliyati", "Sport faoliyati"],
+                    correct: 1
+                },
+                {
+                    question: "Temperament tiplari qaysi qatorda to'liq ko'rsatilgan?",
+                    options: ["Xolerik, sangvinik", "Xolerik, sangvinik, flegmatik", "Xolerik, sangvinik, flegmatik, melonxolik", "Sangvinik, flegmatik"],
+                    correct: 2
+                }
+            ],
+            "2.3": [
+                {
+                    question: "Pedagogning kasbiy mahorati bu ....",
+                    options: ["Bilim darajasi", "Ta'lim jarayonida pedagogik strategiya, innovatsion pedagogik jarayon maqsad va vazifalarni to'g'ri belgilash", "Ish tajribasi", "Ma'lumoti"],
+                    correct: 1
+                },
+                {
+                    question: "\"Kompetetsiya\" tushunchasining lug'aviy ma'nosi?",
+                    options: ["Bilim", "Lotincha \"competere\" degan so'zdan olingan bo'lib, \"loyiq\", \"mos kelmoq\" ma'nosini anglatadi", "Ko'nikma", "Malaka"],
+                    correct: 1
+                },
+                {
+                    question: "Texnologiya so'zining lug'aviy ma'nosi?",
+                    options: ["Fan", "Texne – mahorat, san'at, logos – tushuncha, fan ta'limot", "Usul", "Metod"],
+                    correct: 1
+                },
+                {
+                    question: "Lug'aviy jihatdan \"Innovatsiya\" tushunchasi bu-….",
+                    options: ["O'zgarish", "Yangilik kiritish", "Rivojlantirish", "Takomillashtirish"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogning kommunikativ madaniyati deganda nima tushuniladi?",
+                    options: ["Bilimi", "Pedagogning yuksak darajadagi muloqot ko'nikmalariga egaligi", "Tajribasi", "Ma'lumoti"],
+                    correct: 1
+                }
+            ],
+            "2.4": [
+                {
+                    question: "Skelet nechtadan ortiq suyaklardan tashkil topgan?",
+                    options: ["150 dan", "180 dan", "206 dan", "250 dan"],
+                    correct: 2
+                },
+                {
+                    question: "Umurtqa pog'onasi nechta umurtqadan tashkil topgan?",
+                    options: ["30-31 umurtqalardan", "31-32 umurtqalardan", "32-33 umurtqalardan", "33-34 umurtqalardan"],
+                    correct: 3
+                },
+                {
+                    question: "Ko'krak qafasi necha juft qovurg'alar va to'sh suyagining birikishidan hosil bo'ladi?",
+                    options: ["10 juft", "11 juft", "12 juft", "13 juft"],
+                    correct: 2
+                },
+                {
+                    question: "Odam organizmida muskullar soni nechta?",
+                    options: ["400 ga yaqin", "500 ga yaqin", "600 ga yaqin", "700 ga yaqin"],
+                    correct: 2
+                },
+                {
+                    question: "Plantografiya bu ...",
+                    options: ["Barmoq izini olish", "Oyoq panja izini olish", "Kaft izini olish", "Tana o'lchamini olish"],
+                    correct: 1
+                }
+            ],
+            "2.5": [
+                {
+                    question: "Zilzila vaqtida birlamchi qoida, bu......",
+                    options: ["Tashqariga chiqish", "Vahimaga tushmaslik", "Yugurish", "Baqirish"],
+                    correct: 1
+                },
+                {
+                    question: "Shikastlangan fuqaroning qon tomir ustiga jgut qancha vaqtgacha qo'yilishi shart?",
+                    options: ["30 daqiqa", "1 soat", "Jgut yoz oylarida uzog'i bilan 1,5-2 soat, qish oylarida esa, 1-1,5 soat muddatga", "3 soat"],
+                    correct: 2
+                },
+                {
+                    question: "O'zbekiston Respublikasining \"Fuqaro muhofazasi to'g'risida\" gi qonuni qachon qabul qilindi?",
+                    options: ["1999-yil 26-may", "2000-yil 26-may", "2001-yil 26-may", "2002-yil 26-may"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalining isitish tizimiga qo'yilgan xavfsizlik talablari to'g'ri ko'rsatilgan qatorni belgilang?",
+                    options: ["Ochiq bo'lishi kerak", "Devor sathida tekis o'rnatilib maxsus yog'och panjaralar bilan qoplangan bo'lishi kerak", "Yuqorida joylashgan bo'lishi kerak", "Pastda joylashgan bo'lishi kerak"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalida muntazam ravishda harorat necha gradus bo'lishi kerak?",
+                    options: ["15-17 gradus", "16-18 gradus", "18-20 gradus", "20-22 gradus"],
+                    correct: 2
+                }
+            ]
+        };
+
+        let currentModule = "1.1";
+
+        function loadModule() {
+            currentModule = document.getElementById('moduleSelect').value;
+            displayQuestions();
+            resetTest();
+        }
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsContainer');
+            const questions = testData[currentModule];
+            
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question" id="question${index}">
+                    <div class="question-text">${index + 1}. ${q.question}</div>
+                    <div class="options">
+                        ${q.options.map((option, optIndex) => `
+                            <div class="option" id="q${index}opt${optIndex}">
+                                <input type="radio" name="q${index}" id="q${index}_${optIndex}" value="${optIndex}">
+                                <label for="q${index}_${optIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function checkAnswers() {
+            const questions = testData[currentModule];
+            let correct = 0;
+            let answered = 0;
+
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                
+                if (selected) {
+                    answered++;
+                    const selectedValue = parseInt(selected.value);
+                    const optionDiv = document.getElementById(`q${index}opt${selectedValue}`);
+                    
+                    if (selectedValue === q.correct) {
+                        correct++;
+                        optionDiv.classList.add('correct');
+                    } else {
+                        optionDiv.classList.add('incorrect');
+                        document.getElementById(`q${index}opt${q.correct}`).classList.add('correct');
+                    }
+                }
+            });
+
+            const percentage = answered > 0 ? Math.round((correct / questions.length) * 100) : 0;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = `
+                <div>Результаты теста</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-value">${correct}/${questions.length}</span>
+                        <div>Правильных ответов</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${percentage}%</span>
+                        <div>Процент</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${answered}</span>
+                        <div>Отвечено</div>
+                    </div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        function resetTest() {
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+                input.disabled = false;
+            });
+            
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        window.onload = function() {
+            displayQuestions();
+        };
+    </script>
+</body>
+</html>
