@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивные тесты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .module-selector {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .module-selector label {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 10px;
+        }
+
+        .module-selector select {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+            min-width: 250px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .question:hover {
+            transform: translateX(5px);
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .options {
+            margin-left: 10px;
+        }
+
+        .option {
+            margin: 10px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            width: calc(100% - 25px);
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Интерактивные тесты</h1>
+            <p>Выберите модуль и проверьте свои знания</p>
+        </div>
+
+        <div class="module-selector">
+            <label for="moduleSelect">Выберите модуль:</label>
+            <select id="moduleSelect" onchange="loadModule()">
+                <option value="1.1">1.1 Jamiyat ijtimoiy-siyosiy hayotidagi o‘zgarishlar</option>
+                <option value="1.2">1.2 Ta’lim-tarbiyaning huquqiy-me’yoriy hujjatlari</option>
+                <option value="2.1">2.1 Jismoniy tarbiya va sportda AKT</option>
+                <option value="2.2">2.2 Yosh davrlari psixologiyasi</option>
+                <option value="2.3">2.3 Pedagogning professional kompetentligi</option>
+                <option value="2.4">2.4 Maktab o‘quvchilarining morfofunksional o‘zgarishlari</option>
+                <option value="2.5">2.5 Ta’lim muassasalarida hayot faoliyati xavfsizligi</option>
+                <option value="3.2">3.2 Jismoniy tarbiya nazariyasi va uslubiyati</option>
+                <option value="3.3">3.3 Gimnastika nazariyasi va uslubiyati</option>
+                <option value="3.4">3.4 Sport o‘yinlari nazariyasi va uslubiyati</option>
+                <option value="3.5">3.5 Kurash nazariyasi va uslubiyati</option>
+                <option value="3.6">3.6 Harakatli o‘yinlar va o‘qitish uslubiyati</option>
+                <option value="3.7">3.7 Yengil atletika nazariyasi va uslubiyati</option>
+                <option value="3.8">3.8 Darsdan tashqari jismoniy tarbiya va sport</option>
+                <option value="3.9">3.9 Olimpiya bilim asoslari</option>
+            </select>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="questionsContainer"></div>
+            <div class="buttons">
+                <button class="check-btn" onclick="checkAnswers()">Проверить ответы</button>
+                <button class="reset-btn" onclick="resetTest()">Сбросить</button>
+            </div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const testData = {
+            "1.1": [
+                {
+                    question: "2022−2026 yillarga mo'ljallangan Yangi O'zbekiston Taraqqiyot strategiyasining asosiy prinsipi qanday g'oyadan iborat?",
+                    options: ["Inson qadri uchun!", "Xalq manfaati uchun", "Rivojlanish uchun", "Taraqqiyot uchun"],
+                    correct: 0
+                },
+                {
+                    question: "O'zbekiston xalqi nomidan kim ish olib borishi mumkin?",
+                    options: ["Hukumat", "O'zbekiston xalqi saylagan Respublika Oliy Majlisi va Prezidenti", "Vazirlar", "Hokimlar"],
+                    correct: 1
+                },
+                {
+                    question: "O'zbekiston Respublikasi Davlat madhiyasi mualliflarini aniqlang.",
+                    options: ["A.Oripov, G.Gulom", "A.Oripov, M.Burhonov", "M.Burhonov, G.Gulom", "A.Aripov, M.Shayxov"],
+                    correct: 1
+                },
+                {
+                    question: "\"Xalq boy bo'lsa, davlat ham boy va .....\" jumlani to'ldiring.",
+                    options: ["Mustahkam bo'ladi", "Kuchli bo'ladi", "Qudratli bo'ladi", "Yaxshi bo'ladi"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidenti 2022-yil 20-dekabrda Oliy Majlisga va O‘zbekiston xalqiga Murojaatnomasida keng ko‘lamli islohotlarni qanday ezgu g‘oya asosida amalga oshiramiz, dedi?",
+                    options: ["Adolat – qonun ustuvorligida", "Yangi O‘zbekiston – maktab ostonasidan, ta’lim-tarbiya tizimidan boshlanadi", "Biz kelajagimizni o‘z qo‘limiz bilan quramiz", "Farovonlik va taraqqiyot yo‘lida"],
+                    correct: 1
+                },
+                {
+                    question: "2017-2021 yillarda O‘zbekiston Respublikasini yanada rivojlantirish bo‘yicha Harakatlar strategiyasini amalga oshirishda alohida e’tibor qaratilgan tamoyilni toping?",
+                    options: ["Davlat manfaatlari eng muhimi", "Inson manfaatlari – har narsadan ustun", "Iqtisodiy barqarorlik – asosiy maqsad", "Qonun va tartibot"],
+                    correct: 1
+                },
+                {
+                    question: "Prezidentning 2022-yil 11-maydagi PF-134-son Farmoni bilan 2022-2026-yillarda xalq ta’limini rivojlantirish bo‘yicha qabul qilingan Milliy dasturda darslik va metodik majmualar borarsida qanday yangilik joriy qilinadigan bo‘ldi?",
+                    options: ["Barcha darsliklar bepul bo'ladi", "Darsliklar faqat elektron shaklda bo'ladi", "Umumiy o‘rta ta’lim muassasalari darsliklari va o‘quv-metodik majmualarining erkin savdosi tashkil etiladi", "Darsliklar xorijdan olib kelinadi"],
+                    correct: 2
+                },
+                {
+                    question: "Harakatlar strategiyasidagi Harakat so‘zining ma’nosi nima?",
+                    options: ["Lotincha so'z, 'rivojlanish' degani", "Arabсha so‘z , o‘zbekchada “qo‘zg‘alish” ma’nosini beradi", "Yunoncha so'z, 'strategiya' degani", "Forscha so'z, 'o'zgarish' degani"],
+                    correct: 1
+                },
+                {
+                    question: "Strategiya atamasi qanday xalq tilidan olingan va ma’nosi nima?",
+                    options: ["Lotincha, 'yo'nalish'", "Forscha, 'reja'", "Yunoncha so‘zdan olingan va “jang san’ati” ma’nosini bildiradi", "Arabcha, 'maqsad'"],
+                    correct: 2
+                },
+                {
+                    question: "Mustaqillik boshida siyosiy sohadagi o‘zgarishlardan birini toping?",
+                    options: ["Ko'p partiyaviylik tizimi yo'q qilindi", "Mustabid sovet davri tizimidan voz kechildi", "Yangi konstitutsiya qabul qilinmadi", "Boshqaruvning eski tizimi saqlab qolindi"],
+                    correct: 1
+                },
+                {
+                    question: "“Xalq davlat idoralariga emas,...” jumlani to‘ldiring.",
+                    options: ["hokimiyatga bo'ysunishi kerak", "qonunlarga amal qilishi kerak", "davlat idoralari xalqimizga xizmat qilishi kerak", "prezidentga ishonishi kerak"],
+                    correct: 2
+                },
+                {
+                    question: "Hozirda O‘zbekistonda nechta siyosiy partiyalar faoliyat yuritmoqda?",
+                    options: ["3 ta", "4 ta", "5 ta", "6 ta"],
+                    correct: 2
+                }
+            ],
+            "1.2": [
+                {
+                    question: "Davlat ta’lim standartlariga toʻgʻri ta’rif berilgan javobni belgilang.",
+                    options: ["O‘quv dasturlari va rejalar majmui", "Davlat tomonidan ta’limning mazmuni va sifatiga nisbatan belgilanadigan talablar majmui", "Faqat oliy ta’limga oid talablar", "Maktabgacha ta’lim muassasalari uchun qo‘llanma"],
+                    correct: 1
+                },
+                {
+                    question: "Davlat ta’lim talablariga toʻgʻri ta’rif berilgan javobni belgilang.",
+                    options: ["Ta’limning barcha bosqichlari uchun yagona dastur", "Ta’lim oluvchilarning jismoniy, shaxsiy, intellektual, ilmiy hamda kasbiy sifatlariga qo‘yiladigan majburiy talablar", "O'qituvchilarning malakasiga qo'yiladigan talablar", "Faqat bitiruvchilarga qo'yiladigan talablar"],
+                    correct: 1
+                },
+                {
+                    question: "Quyidagi qaysi javobda ta’lim turlari O‘zbekiston Respublikasi Ta’lim toʻgʻrisidagi Qonunga muvofiq toʻgʻri koʻrsatilgan?",
+                    options: ["Boshlang'ich, o'rta va oliy ta'lim", "Maktabgacha ta’lim va tarbiya; umumiy o‘rta va o‘rta maxsus ta’lim; professional ta’lim; oliy ta’lim; oliy ta’limdan keyingi ta’lim; kadrlarni qayta tayyorlash va ularning malakasini oshirish; maktabdan tashqari ta’lim", "Faqat davlat va nodavlat ta'lim", "Kunduzgi, sirtqi va masofaviy ta'lim"],
+                    correct: 1
+                },
+                {
+                    question: "Sport maktablari qanday ta’lim turini amalga oshiradi?",
+                    options: ["Umumiy o‘rta ta’lim", "Professional ta’lim", "Maktabdan tashqari ta’lim", "Oliy ta’lim"],
+                    correct: 2
+                },
+                {
+                    question: "Normativ-huquqiy hujjat tushunchasiga toʻgʻri ta’rif berilgan javobni belgilang.",
+                    options: ["Qonunchilikka muvofiq qabul qilingan, umummajburiy davlat ko‘rsatmalari sifatida huquqiy normalarni belgilashga, o‘zgartirishga yoki bekor qilishga qaratilgan rasmiy hujjatdir", "Faqat sud tomonidan qabul qilingan qarorlar", "Tavsiyaviy xarakterga ega bo'lgan hujjat", "Jamoat tashkilotlarining ichki nizomi"],
+                    correct: 0
+                },
+                {
+                    question: "Normativ-huquqiy hujjatlar qabul qilish huquqiga ega bo‘lgan organlar yoki mansabdor shaxslar qatoriga kimlar kirmaydi?",
+                    options: ["Oliy Majlis palatalari", "Prezident", "Vazirlar Mahkamasi", "Sport federatsiyalari"],
+                    correct: 3
+                },
+                {
+                    question: "Normativ-huquqiy hujjatlarni o‘ziga xos xususiyatlarga koʻra qanday guruhlarga ajratish mumkin?",
+                    options: ["Rasmiy va norasmiy hujjatlar", "Qonunlar va qonunosti hujjatlari", "Milliy va xalqaro hujjatlar", "Yangi va eski hujjatlar"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidenti qanday normativ-huquqiy hujjatlar qabul qiladi?",
+                    options: ["Farmonlar va qarorlar", "Faqat qonunlar", "Faqat buyruqlar", "Qonunlar va farmoyishlar"],
+                    correct: 0
+                },
+                {
+                    question: "O‘zbekiston Respublikasining qonunlariga toʻgʻri ta’rif berilgan javobni belgilang.",
+                    options: ["Hokimiyatning barcha bo'g'inlari uchun majburiy bo'lgan hujjatlar", "O‘zbekiston Respublikasining qonunlari eng muhim va barqaror ijtimoiy munosabatlarni tartibga soladi hamda O‘zbekiston Respublikasi Oliy Majlisi tomonidan yoki referendum o‘tkazish yo‘li bilan qabul qilinadi", "Prezident tomonidan tasdiqlanadigan hujjatlar", "Vaqtinchalik amal qiladigan hujjatlar"],
+                    correct: 1
+                },
+                {
+                    question: "Quyidagilardan qaysilari qonun hujjatlari hisoblanadi?",
+                    options: ["Faqat O'zbekiston Respublikasi Konstitutsiyasi", "O‘zbekiston Respublikasining Konstitutsiyasi va qonunlari, O‘zbekiston Respublikasi Oliy Majlisi palatalarining qarorlari", "Prezident farmonlari va qarorlari", "Vazirlar Mahkamasining qarorlari"],
+                    correct: 1
+                },
+                {
+                    question: "Qonunosti hujjatlari nima uchun qabul qilinadi?",
+                    options: ["Qonunlarni bekor qilish uchun", "O‘zbekiston Respublikasining Konstitutsiyasi va qonunlari, Oliy Majlis palatalarining qarorlari, Prezident farmonlari va qarorlari asosida hamda ularni ijro etish uchun", "Yangi qonunlar yaratish uchun", "Xalqaro shartnomalarni tasdiqlash uchun"],
+                    correct: 1
+                },
+                {
+                    question: "Umumta’lim maktablarida o‘quvchilar orasidan jismoniy tarbiya o‘qituvchilarini jalb qilgan holda iste’dodli yoshlarni saralab olish (seleksiya) hamda sport maktablari sport zaxirasini shakllantirish maqsadida keyinchalik mintaqaviy sport musobaqalarida ishtirok etish uchun sinfdan tashqari sport to‘garaklari va seksiyalari mashg‘ulotlarini tashkil etish haftasiga necha soatni tashkil qilishi belgilangan?",
+                    options: ["kamida 2 soat", "kamida 3 soat", "kamida 4 soat", "kamida 6 soat"],
+                    correct: 2
+                },
+                {
+                    question: "O‘rta maxsus, kasb-hunar ta’lim muassasalarida o‘quvchilar orasidan jismoniy tarbiya o‘qituvchilari va sport turi bo‘yicha trenerlarni jalb qilgan holda iste’dodli yoshlarni saralash va ixtisoslashtirilgan sport maktablari sport zaxirasini shakllantirish maqsadida keyinchalik mintaqaviy hamda respublika sport musobaqalarida ishtirok etish uchun olimpiya va milliy sport turlari bo‘yicha sinfdan tashqari sport to‘garaklari hamda seksiyalari mashg‘ulotlarini tashkil etish haftasiga necha soatni tashkil qilishi belgilangan?",
+                    options: ["kamida 4 soat", "kamida 5 soat", "kamida 6 soat", "kamida 8 soat"],
+                    correct: 2
+                },
+                {
+                    question: "Qonun bu-….",
+                    options: ["Prezident tomonidan qabul qilingan hujjat", "O‘zbekiston Respublikasida eng muhim va barqaror ijtimoiy munosabatlarni tartibga soladigan masalalar bo‘yicha, O‘zbekiston Respublikasi Oliy Majlisi tomonidan yoki referendum o‘tkazish yo‘li bilan qabul qilinadigan oliy yuridik kuchga ega bo‘lgan normative-huquqiy hujjat", "Vazirlar Mahkamasining qarori", "Hokimlik tomonidan chiqarilgan hujjat"],
+                    correct: 1
+                },
+                {
+                    question: "Quyida keltirilgan qaysi normativ-huquqiy hujjat jismoniy tarbiya va sportning asosiy huquq manbai hisoblanadi?",
+                    options: ["O‘zbekiston Respublikasi Konstitutsiyasi", "Ta'lim to'g'risidagi Qonun", "O‘zbekiston Respublikasining “Jismoniy tarbiya va sport to‘g‘risida” gi Qonuni", "Prezident Farmoni"],
+                    correct: 2
+                },
+                {
+                    question: "Qaysi hujjatda Sport-taʼlim muassasalari faoliyatini yanada takomillashtirish, iqtidorli yoshlarni aniqlash, tanlash va saralash (selektsiya)ning raqamlashtirilgan yangi tizimini joriy qilish haqida soʻz boradi?",
+                    options: ["PF-6099-son Farmonida", "PQ-201-son qarorida", "O‘zbekiston Respublikasi Prezidentining 2021-yil 5-noyabrdagi PQ-5279-son qarorida", "“Jismoniy tarbiya va sport to‘g‘risida”gi Qonunida"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidentining 2020-yil 30-oktabrdagi PF-6099-son “Sog‘lom turmush tarzini keng tatbiq etish va ommaviy sportni yanada rivojlantirish chora-tadbirlari to‘g‘risida” Farmoniga ko‘ra umumta’lim maktablarida qanday sport mashg‘ulotlarini muntazam ravishda o‘tkazish belgilangan?",
+                    options: ["“Olimpiya zaxiralari”", "“Besh tashabbus olimpiadasi”", "“biz bilan bajar, bizdek bajar, bizdan yaxshiroq bajar!”", "“Sog'lom avlod”"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidentining 2020-yil 30-oktabrdagi PF-6099-son Farmoniga ko‘ra Respublikada aholi o‘rtasida ommaviy sportni rivojlantirish va sog‘lom turmush tarzini targ‘ib qilishda sportning qaysi turlari ustuvor turlar etib belgilangan.",
+                    options: ["Futbol, basketbol, voleybol, kurash", "Boks, dzyudo, taekvondo, og'ir atletika", "yurish, yugurish, mini-futbol, velosport, badminton, stritbol, “Workout” (mahalla va ko‘cha fitnesi)", "Gimnastika, suzish, shaxmat, shashka"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidentining 2022-yil 11-apreldagi PQ-201-son qaroriga muvofiq 2022-yildan boshlab har yili an’anaviy tarzda qanday ommaviy sport musobaqalarini o‘tkazish tizimini joriy etish belgilangan.",
+                    options: ["“Umid nihollari”", "“Barkamol avlod”", "besh bosqichli “Besh tashabbus olimpiadasi”", "“Universiada”"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi Prezidentining 2022-yil 11-apreldagi PQ-201-son qaroriga muvofiq 2023-yil 1-martdan boshlab qanday umumrespublika sport musobaqalarini o‘tkazish tizimi joriy etish belgilangan.",
+                    options: ["olimpiya, noolimpiya va milliy sport turlari bo‘yicha uch bosqichli umumrespublika sport musobaqalari", "“Yoshlar kubogi” musobaqalari", "“Mahalla kubogi” musobaqalari", "Viloyat chempionatlari"],
+                    correct: 0
+                }
+            ],
+            "2.1": [
+                {
+                    question: "Prezident tomonidan ilgari surilgan beshta muhim tashabbusning uchinchi qanday nomlangan?",
+                    options: ["Sportni rivojlantirishga", "aholi va yoshlar o‘rtasida kompyuter texnologiyalari va internetdan samarali foydalanishni tashkil etishga qaratilgan", "Ta'lim sifatini oshirishga", "Madaniyatni rivojlantirishga"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiya va sport bo‘yicha mutaxassislarni qayta tayyorlash va malakasini oshirish instituti veb saytini aniqlang",
+                    options: ["sport.uz", "sportedu.uz", "talim.uz", "jismoniy.uz"],
+                    correct: 1
+                },
+                {
+                    question: "Microsoft PowerPoint – bu qanday dastur?",
+                    options: ["Matn muharriri", "taqdimot muxarriri", "Elektron jadval", "Ma'lumotlar bazasi"],
+                    correct: 1
+                },
+                {
+                    question: "Internet ta’lim muassasalari domenini ko‘rsating?",
+                    options: [".com", ".gov", ".edu", ".org"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasi hukumat portalini aniqlang.",
+                    options: ["my.gov.uz", "www.gov.uz", "parliament.gov.uz", "president.uz"],
+                    correct: 1
+                },
+                {
+                    question: "Respublikamizda yaratilgan ta’lim muassasalarining ta’lim tarmog‘ini ko‘rsating?",
+                    options: ["uzedu", "itsm", "ziyonet", "edunet"],
+                    correct: 2
+                },
+                {
+                    question: "Axborot uzatish tezligining o‘lchov birligi nima ?",
+                    options: ["gigabayt", "megabit", "megabayt", "kilobayt"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasining domen zonasini aniqlang.",
+                    options: [".uz", ".com", ".ru", ".org"],
+                    correct: 0
+                },
+                {
+                    question: "Microsoft Word – bu qanday dastur?",
+                    options: ["Elektron jadvallar dasturi", "Taqdimot yaratish dasturi", "matnli hujjatlarni yaratish, ko‘rish va tahrirlash uchun mo‘ljallangan dastur", "Grafik muharrir"],
+                    correct: 2
+                },
+                {
+                    question: "Microsoft PowerPoint dasturi yordamida yaratiladigan hujjatlar qanday nomlanadi?",
+                    options: ["kitob", "hujjat", "slayd", "“prezentatsiya”"],
+                    correct: 3
+                },
+                {
+                    question: "Microsoft Еxcel dasturida yaratiladigan hujjatlar qanday nomlanadi?",
+                    options: ["varaqa", "“kniga”", "jadval", "diagramma"],
+                    correct: 1
+                },
+                {
+                    question: "Microsoft Excel – bu qanday dastur?",
+                    options: ["Matn muharriri", "Taqdimot muharriri", "elektron jadvallar bilan ishlash dasturi", "Grafik muharriri"],
+                    correct: 2
+                },
+                {
+                    question: "Ziyonet axborot ta’lim tarmog‘i doirasida tuzilgan mualliflik maqolalarini chop etish mumkin bo‘lgan veb saytini aniqlang",
+                    options: ["uz.wikipedia.org", "fikr.uz", "kun.uz", "daryo.uz"],
+                    correct: 1
+                },
+                {
+                    question: "Kompyuter virusi nima?",
+                    options: ["Kompyuterning ishlashini tezlashtiruvchi dastur", "Foydalanuvchiga yordam beruvchi dastur", "o‘lchami jihatidan katta bo‘lmagan va nazarda tutilmagan amallarni bajarishga mo‘ljallab yozilgan maxsus dastur", "Internetga ulanishni ta'minlovchi dastur"],
+                    correct: 2
+                },
+                {
+                    question: "Internetga egalik qilish huquqi qaysi davlatga tegishli?",
+                    options: ["AQSHga", "Rossiyaga", "Xitoyga", "hech bir davlatga berilmagan"],
+                    correct: 3
+                },
+                {
+                    question: "Internet vatani sifatida qaysi davlat tan olingan?",
+                    options: ["Buyuk Britaniya", "Amerika Qo‘shma Shtatlari", "Germaniya", "Yaponiya"],
+                    correct: 1
+                },
+                {
+                    question: "Sayt deganda nimani tushunasiz?",
+                    options: ["internetdagi bitta nomga ega bo‘lgan sahifani", "kompyuterdagi papka", "elektron pochta manzili", "dasturiy ta'minot"],
+                    correct: 0
+                },
+                {
+                    question: "Internet tarmog‘ida online ravishda Excel elektron jadvali bilan ishlash imkoniyatini beruvchi Internet server qanday nomlanadi?",
+                    options: ["Google Docs", "Google Sheets (tablitsa)", "Google Slides", "Microsoft Word Online"],
+                    correct: 1
+                },
+                {
+                    question: "Axborotning qanday ko‘rinishi va turlari bor?",
+                    options: ["faqat matn", "faqat rasm va tovush", "rasm, chizma, matn, tovush", "faqat video"],
+                    correct: 2
+                },
+                {
+                    question: "Web sahifada qanday axborotlarni joylashtirish mumkin?",
+                    options: ["faqat matn va rasmlarni", "matn, rasm, tovush, videotasvir", "faqat videolarni", "faqat tovushli fayllarni"],
+                    correct: 1
+                },
+                {
+                    question: "Internetda WEB-sahifani ko‘rish uchun qaysi dastur kerak bo‘ladi?",
+                    options: ["antivirus", "matn muharriri", "brauzer", "arxivator"],
+                    correct: 2
+                },
+                {
+                    question: "Brauzer – bu qanday dastur hisoblanadi?",
+                    options: ["Fayl menejeri", "internetda ma’lumotlarni izlab topish, ko‘rish va qabul qilishni yengillashtiruvchi dastur", "Antivirus dasturi", "Arxivator"],
+                    correct: 1
+                },
+                {
+                    question: "Internet qaysi tarmoq turiga kiradi?",
+                    options: ["lokal", "regional", "korporativ", "global"],
+                    correct: 3
+                },
+                {
+                    question: "Internet tarmog‘ida online ravishda Word hujjati bilan ishlash imkoniyatini beruvchi Internet server qanday nomlanadi?",
+                    options: ["Google Sheets", "Google Slides", "Google Docs", "Google Forms"],
+                    correct: 2
+                },
+                {
+                    question: "Ko‘pgina axborotlarni o‘zida jamlagan internet sahifalari yig‘indisi qanday nomlanadi?",
+                    options: ["blog", "forum", "websayt", "portal"],
+                    correct: 2
+                },
+                {
+                    question: "Virtual so’zining ma’nosi qanday?",
+                    options: ["Haqiqiy", "Mavjud bo'lmagan", "xayoliy", "Sun'iy"],
+                    correct: 2
+                },
+                {
+                    question: "Yagona interaktiv davlat xizmatlari portalining domenini aniqlang",
+                    options: ["gov.uz", "my.gov.uz", "e-gov.uz", "davlat.uz"],
+                    correct: 1
+                }
+            ],
+            "2.2": [
+                {
+                    question: "Turli yosh davrlari psixik taraqqiyotining umumiy qonuniyatlarini, psixik rivojlanishini hamda psixologik xususiyatlarini o‘rganuvchi fan qaysi javobda to‘g‘ri berilgan.",
+                    options: ["Pedagogika", "yosh davrlar psixologiyasi", "Fiziologiya", "Sotsiologiya"],
+                    correct: 1
+                },
+                {
+                    question: "Bola necha yoshdan boshlab mantiqiy fikrlaydi?",
+                    options: ["1-2 yoshdan", "2-3 yoshdan", "3-5 yoshdan", "6-7 yoshdan"],
+                    correct: 2
+                },
+                {
+                    question: "Bu davr¬ – o‘ziga xos ruhiy inqiroz yoki tanglikni boshdan kechirib, shaxsning ijtimoiy va kasbiy mavqeyini anglashdan boshlanadi?",
+                    options: ["kichik maktab yoshi", "o‘smirlik yoshi", "ilk o'spirinlik yoshi", "yetuklik yoshi"],
+                    correct: 1
+                },
+                {
+                    question: "“Maktab”ga berilgan to‘g‘ri ta’rifni belgilang?",
+                    options: ["Faqat bilim beradigan joy", "jamiyatning ijtimoiy institutlaridan biri bo‘lib, maqsadi ta’lim-tarbiya berishdir", "Bolalarning bo'sh vaqtini o'tkazadigan maskan", "Oliy ta'limga tayyorlovchi muassasa"],
+                    correct: 1
+                },
+                {
+                    question: "Yosh davrlar psixologiyasini o‘rganadigan sohani toping?",
+                    options: ["gerontogenez", "ontogenez", "fiziologiya", "sotsiogenez"],
+                    correct: 1
+                },
+                {
+                    question: "Yosh davrlari psixologiyasida o‘sish va rivojlanishning tezlashuv jarayoni nima?",
+                    options: ["retardatsiya", "akseleratsiya", "adaptatsiya", "regeneratsiya"],
+                    correct: 1
+                },
+                {
+                    question: "Jamoa, sinf, guruhlarda o‘quvchilarning o‘zaro munosabatlarini aniqlashda qaysi metod muhim ahamiyatga ega?",
+                    options: ["kuzatish metodi", "anketa metodi", "sotsiometriya metodi", "test metodi"],
+                    correct: 2
+                },
+                {
+                    question: "Psixik taraqqiyot qonunlarini ontogenez rivojlanishi jarayonining har bir bosqichlarida kishilarga xos bo‘ladigan psixologik xususiyatlarni o‘rganadigan psixologiya fanining sohasi qanday ataladi?",
+                    options: ["umumiy psixologiya", "pedagogik psixologiya", "yosh davrlari psixologiyasi", "ijtimoiy psixologiya"],
+                    correct: 2
+                },
+                {
+                    question: "Qaysi yosh davrida turli kasblarga qiziqish, kelajagida kim bo‘lishni tasavvur qilish yuz beradi?",
+                    options: ["kichik maktab davri", "o'smirlik davri", "o‘spirinlik davri", "yetuklik davri"],
+                    correct: 2
+                },
+                {
+                    question: "Sportchilar shaxsi va faoliyatining psixologik tomonlarini qaysi fan o‘rganadi?",
+                    options: ["pedagogika", "sport psixologiyasi", "sport fiziologiyasi", "sport tibbiyoti"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yoshidagi bolalar aynan necha yoshga to‘g’ri keladi?",
+                    options: ["5-8 yosh", "6-9 yosh", "7-11 yosh – 1-4 sinf (boshlang’ich maktab) yoshiga", "8-12 yosh"],
+                    correct: 2
+                },
+                {
+                    question: "O‘smirlik davri necha yoshlarga to‘g’ri keladi?",
+                    options: ["9-13 yoshlarga", "10-15 yoshlarga", "11-16 yoshlarga", "12-17 yoshlarga"],
+                    correct: 1
+                },
+                {
+                    question: "Bolani o‘qish faoliyatiga undovchi kuch nima?",
+                    options: ["Qobiliyat", "Motiv", "Qiziqish", "Iroda"],
+                    correct: 1
+                },
+                {
+                    question: "Psixik (bilish) jarayonlari ko‘rsatilgan qatorni ko‘rsating?",
+                    options: ["hissiyot, iroda, xarakter", "temperament, qobiliyat, motiv", "sezgi, idrok, xotira, tafakkur, xayol, nutq, diqqat", "shaxs, faoliyat, muloqot"],
+                    correct: 2
+                },
+                {
+                    question: "Qobiliyat bu – nima?",
+                    options: ["tug'ma xususiyat", "faoliyat bilan bog’liq individual psixologik xususiyat", "bilimlar majmui", "ko'nikma va malaka"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yoshi davrida qaysi faoliyat yetakchi hisoblanadi?",
+                    options: ["O'yin faoliyati", "o‘qish faoliyati", "Mehnat faoliyati", "Sport faoliyati"],
+                    correct: 1
+                },
+                {
+                    question: "Temperament tiplari qaysi qatorda to‘liq ko‘rsatilgan?",
+                    options: ["Xolerik, sangvinik", "Flegmatik, melanxolik", "xolerik, sangvinik. flegmatik,melonxolik", "Introvert, ekstravert"],
+                    correct: 2
+                },
+                {
+                    question: "Qaysi javobda psixik kechinmalar to‘g‘ri keltirilgan?",
+                    options: ["idrok, tafakkur", "xayajon, empatiya", "xotira, diqqat", "nutq, xayol"],
+                    correct: 1
+                },
+                {
+                    question: "Shaxs shakllanishiga ta’sir etuvchi omillarni ko‘rsating?",
+                    options: ["faqat irsiyat", "faqat muhit va tarbiya", "irsiyat, muhit, tarbiya, ta’lim", "faqat ta'lim"],
+                    correct: 2
+                },
+                {
+                    question: "Psixogigiyena bu – qanday fan?",
+                    options: ["ruhiy kasalliklarni davolash haqidagi fan", "odam ruhiy salomatligini saqlash va mustahkamlash haqidagi fan", "jismoniy salomatlik haqidagi fan", "psixologik testlar haqidagi fan"],
+                    correct: 1
+                },
+                {
+                    question: "Ilk o‘spirinlik davri necha yoshga to‘g‘ri keladi?",
+                    options: ["12-14 yosh", "13-16 yosh", "14-15 yoshdan 17-18 yoshgacha", "16-20 yosh"],
+                    correct: 2
+                },
+                {
+                    question: "Jismoniy tarbiya fani o‘qituvchisi dars jarayonlarini tashkil etishda ko‘proq qanday yondashuv usuli samaradorlikni ta’minlaydi?",
+                    options: ["individual ishlash", "faqat frontal ishlash", "mashg’ulotlarda hamkorlikda ishlash", "ma'ruza usuli"],
+                    correct: 2
+                },
+                {
+                    question: "Trening so‘ziga berilgan to‘g‘ri ta’rifini ko‘rsating?",
+                    options: ["musobaqa", "jismoniy yuklama", "Trening – mashq qilish, biror maqsadga yo‘naltirilgan pedagogik va psixologik aqliy o‘yin mashqlarini ijro etish", "dam olish"],
+                    correct: 2
+                },
+                {
+                    question: "Autogen mashqlar tizimi bu-…?",
+                    options: ["jismoniy mashqlar tizimi", "o‘z-o‘zini ishontirish mashg‘uloti", "nafas olish mashqlari", "mantiqiy mashqlar"],
+                    correct: 1
+                },
+                {
+                    question: "Musobaqa bu – qanday jarayon?",
+                    options: ["faqat g'alaba qozonish", "o‘quvchi faoliyatini belgilovchi, kuzatuvchi omildir", "dam olish jarayoni", "yangi bilimlarni o'rganish"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yosh davri necha yoshlarni tashkil etadi?",
+                    options: ["5-9 yosh", "6-7 yoshdan 10-11 yoshgacha", "8-12 yosh", "9-13 yosh"],
+                    correct: 1
+                },
+                {
+                    question: "Akmeologiya yosh psixologiyasining qanday sohasi sanaladi?",
+                    options: ["bolalik davri psixologiyasi", "o'smirlik davri psixologiyasi", "yetuklik davri psixologiyasi", "keksalik davri psixologiyasi"],
+                    correct: 2
+                },
+                {
+                    question: "Bolada o‘zini-o‘zi boshqarishning dastlabki elementlari taxminan qachondan shakllana boshlaydi?",
+                    options: ["1 yoshdan", "2 yoshdan", "3 yoshdan", "4 yoshdan"],
+                    correct: 1
+                },
+                {
+                    question: "Kichik maktab yoshidagi bolalarning bilish faoliyatida tafakkurning qaysi turi ustunlik qiladi?",
+                    options: ["mavhum-mantiqiy tafakkur", "ko‘rgazmali-obrazli tafakkur", "ijodiy tafakkur", "tanqidiy tafakkur"],
+                    correct: 1
+                }
+            ],
+            "2.3": [
+                {
+                    question: "Pedagogik bilimdonlikning asosiy shakllari nima?",
+                    options: ["Faqat o'z fanini bilish", "kasbiy- metodik faoliyatini ijtimoiy talab, huquqiy me’yor va dtsga muvofiq tashkil etishi", "O'quvchilar bilan yaxshi munosabatda bo'lish", "Ma'muriyat talablarini bajarish"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogik odobning asosiy shakllari qaysi javobda to‘g‘ri ko‘rsatilgan?",
+                    options: ["O'quvchilarga qattiqqo'l bo'lish", "pedagog o‘quv-tarbiya jarayoni ishtirokchilariga munosabatlarida jamiyatda qabul qilingan axloqiy-huquqiy me’yoriy talablar", "Ota-onalar bilan muloqotdan qochish", "Faqat o'z hamkasblarini hurmat qilish"],
+                    correct: 1
+                },
+                {
+                    question: "Mimika tushunchasini qanday izohlaysiz?",
+                    options: ["Qo'l harakatlari", "pedagog his-hayajonining ifoda etishi, ko‘z, qosh, yuz mushaklari ma’noli harakatlarining nutqiga mosligi", "Ovoz balandligi", "To'g'ri qad-qomat"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogning kreativ faoliyati bu ....",
+                    options: ["Darslikdagi mavzuni yoddan aytib berish", "kasbiy faoliyatida yangi fikr, g‘oya yaratish va yechimga olib keluvchi intellektual jarayon", "Qat'iy belgilangan qoidalarga amal qilish", "An'anaviy usullardan foydalanish"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogning kasbiy mahorati bu ....",
+                    options: ["Bilim darajasi", "ta’lim jarayonida pedagogik strategiya, innovatsion - pedagogik jarayon maqsad va vazifalarni to‘g‘ri belgilash", "Ish tajribasi", "Ma'lumoti"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogning kasbiy motivatsiyasi bu ....",
+                    options: ["Yuqori maosh olish istagi", "kasbga tegishli vazifalarni bajarishga oid faoliyat ta’sirida shakllanuvchi mayl", "Obro'-e'tiborga erishish", "Ta'tilga chiqish istagi"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogning kommunikativ madaniyati deganda nima tushuniladi?",
+                    options: ["Faqat chiroyli gapirish", "pedagogning yuksak darajadagi muloqot ko‘nikmalariga egaligi", "Jim turishni afzal ko'rish", "Faqat buyruq berish"],
+                    correct: 1
+                },
+                {
+                    question: "Muammoli vaziyat bu ....",
+                    options: ["O'quvchining darsga tayyor emasligi", "shaxs yoki guruh faoliyatiga ta’sir ko‘rsatuvchi holat", "O'qituvchining kayfiyati yo'qligi", "Dars jadvalidagi o'zgarish"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogik akseologiya atamasiga to‘g‘ri berilgan javobni belgilang.",
+                    options: ["Pedagogik qadriyatlar to'g'risidagi ta'limot", "pedagogik innovatsiyalarni o‘zlashtirilish darajasini baholash bo‘yicha nazariy bilimlar", "Pedagogik faoliyatning eng yuqori cho'qqisi", "Pedagogning o'zini o'zi baholashi"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagogik akmealogiya bu ....",
+                    options: ["Pedagogning kasbiy kasalliklari", "pedagog faoliyatining turli bosqichlarida eng kuchli qobiliyatlarini namoyon bo‘lishi", "Pedagogning pensiyaga chiqish davri", "Pedagogik nizolar"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagog attestatsiyasiga berilgan to‘g‘ri ta’rifni ko‘rsating.",
+                    options: ["Pedagogning ishdan bo'shatish jarayoni", "pedagogning layoqati, malakasi, bilim darajasi va xulq – atvorini aniqlash uchun o‘tkaziladigan sinov", "Pedagogga mukofot berish", "Pedagogning darsini kuzatish"],
+                    correct: 1
+                },
+                {
+                    question: "Pedagog autotreni deganda nima tushuniladi?",
+                    options: ["Pedagogning shaxsiy avtomobili", "pedagogning kasbiy layoqati, mahoratini ishontirishga asoslangan maxsus mashqlar majmui", "Pedagoglar uchun sayohat", "Pedagogning jismoniy mashqlari"],
+                    correct: 1
+                },
+                {
+                    question: "Malaka deganda nima tushuniladi?",
+                    options: ["Oliy ma'lumot to'g'risidagi diplom", "shaxsning kasbiy faoliyatni bajarishga tayyorgarligini ifodalaydigan, tegishli ma’lumoti bilan tasdiqlanadigan bilim, qobiliyat, mahorat va ko‘nikmalar darajasi", "Ish staji", "Lavozimi"],
+                    correct: 1
+                },
+                {
+                    question: "“Kompetensiya” tushunchasining lug‘aviy ma’nosi?",
+                    options: ["Bilim", "lotincha “competere” degan so‘zdan olingan bo‘lib, “loyiq”, “mos kelmoq” ma’nosini anglatadi", "Ko'nikma", "Malaka"],
+                    correct: 1
+                },
+                {
+                    question: "Psixologik, metodik, informatsion, kreativ, innovatsion va kommunikativ kompetentlik. Ushbu tarkibiy asoslar pedagogda qanday kompetentlikka xos?",
+                    options: ["Umumiy kompetentlikka", "maxsus kompetentlikka", "Tayanch kompetentlikka", "Kasbiy kompetentlikka"],
+                    correct: 1
+                },
+                {
+                    question: "Texnologiya so‘zining lug‘aviy ma’nosi?",
+                    options: ["Fan", "texne – mahorat, san’at, logos – tushuncha, fan ta’limot", "Usul", "Metod"],
+                    correct: 1
+                },
+                {
+                    question: "Lug‘aviy jihatdan “Innovatsiya” tushunchasi bu-….",
+                    options: ["O'zgarish", "yangilik kiritish", "Rivojlantirish", "Takomillashtirish"],
+                    correct: 1
+                }
+            ],
+            "2.4": [
+                {
+                    question: "Skelet nechtadan ortiq suyaklardan tashkil topgan?",
+                    options: ["150 dan", "180 dan", "206 dan", "250 dan"],
+                    correct: 2
+                },
+                {
+                    question: "Odam tanasidagi nechta suyaklar juft, nechtasi toq buladi?",
+                    options: ["70 tasi juft, 66 tasi toq", "85 tasi juft, 36 tasi toq", "90 tasi juft, 26 tasi toq", "100 tasi juft, 6 tasi toq"],
+                    correct: 1
+                },
+                {
+                    question: "Miyelin pardasining ustunidan o‘rab turuvchi parda nima deb ataladi?",
+                    options: ["Neyrolemma", "Shvann pardasi", "Endonerviy", "Perinerviy"],
+                    correct: 1
+                },
+                {
+                    question: "Suyaklarni o‘sish jarayoni uzoq muddat davom etib o‘g‘il bolalarda necha yoshgacha davom etadi?",
+                    options: ["18-20", "20-22", "22-25", "26-28"],
+                    correct: 2
+                },
+                {
+                    question: "Suyaklarni o‘sish jarayoni uzoq muddat davom etib qiz bolalarda necha yoshgacha davom etadi?",
+                    options: ["16-18", "18-20", "20-22", "23-25"],
+                    correct: 2
+                },
+                {
+                    question: "Uzun naysimon suyagining bo‘shliq qismidagi formulasi K3Fe(CN)6 bo‘lgan tuz nomini toping?",
+                    options: ["sariq qon tuzi", "qizil qon tuzi", "osh tuzi", "gematogen"],
+                    correct: 1
+                },
+                {
+                    question: "O‘sish jarayonida qizil ilik (qizil qon tuzi)ning o‘rnini egallaydigan formulasi K4 Fe (CN)6 bo‘lgan tuz nomini toping?",
+                    options: ["qizil qon tuzi", "sariq qon tuzi", "kaliy xlorid", "natriy sulfat"],
+                    correct: 1
+                },
+                {
+                    question: "Suyakning tanasi nima deb ataladi?",
+                    options: ["Epifiz", "Metafiz", "Diafiz", "Apofiz"],
+                    correct: 2
+                },
+                {
+                    question: "Suyakning ikki uchi nima deb ataladi?",
+                    options: ["Diafiz", "Epifiz", "Metafiz", "Apofiz"],
+                    correct: 1
+                },
+                {
+                    question: "Umurtqa pog‘onasi nechta umurtqadan tashkil topgan?",
+                    options: ["30-31 umurtqalardan", "31-32 umurtqalardan", "32-33 umurtqalardan", "33-34 umurtqalardan"],
+                    correct: 3
+                },
+                {
+                    question: "Ko‘krak qafasi necha juft qovurg‘alar va to‘sh suyagining birikishidan hosil bo‘ladi?",
+                    options: ["10 juft", "11 juft", "12 juft", "13 juft"],
+                    correct: 2
+                },
+                {
+                    question: "Son, katta va kichik boldir suyaklari necha yoshda to‘liq suyakka aylanadi?",
+                    options: ["16-18", "18-20", "20-24", "25-27"],
+                    correct: 2
+                },
+                {
+                    question: "Kaft oldi suyaklari necha yoshda to‘liq suyakka aylanadi?",
+                    options: ["12-15", "15-17", "17-21", "22-24"],
+                    correct: 2
+                },
+                {
+                    question: "Oyoq panja falangalari necha yoshda to‘liq suyakka aylanadi?",
+                    options: ["12-14", "15-21", "22-23", "24-25"],
+                    correct: 1
+                },
+                {
+                    question: "Odam organizmida muskullar soni nechta?",
+                    options: ["400 ga yaqin", "500 ga yaqin", "600 ga yaqin", "700 ga yaqin"],
+                    correct: 2
+                },
+                {
+                    question: "Miyelin pardasining ustunidan o‘rab turuvchi pardaga qanday parda deyiladi?",
+                    options: ["Neyrolemma", "Shvann pardasi", "Endonerviy", "Perinerviy"],
+                    correct: 1
+                },
+                {
+                    question: "Skolioz bo‘lgan odam tik turganda... 1) yelkalari past-baland; 2) ko‘krak qafasi har ikki tomondan botiq; 3) ko‘kraklari baland-past; 4) ko‘krak qafasi yassi; 5) ko‘krak qafasining bir tomoni botiqroq bo‘ladi",
+                    options: ["1,2,3", "2,4,5", "1,3,5", "1,2,4"],
+                    correct: 2
+                },
+                {
+                    question: "Somatotrop gormoni kuchayib ketsa qanday kasallik kelib chiqadi?",
+                    options: ["Nanizm", "Gigantizm", "Akromegaliya", "Raxit"],
+                    correct: 1
+                },
+                {
+                    question: "Tabiiy egilishda umurtqa pog‘onasining qaysi qismi biroz oldingi egilgan bo‘ladi?",
+                    options: ["ko'krak va dum", "bo‘yin va bel", "faqat bo'yin", "faqat bel"],
+                    correct: 1
+                },
+                {
+                    question: "Tabiiy egilishda umurtqa pog‘onasining qaysi qismi biroz orqaga egilgan bo‘ladi?",
+                    options: ["bo'yin va bel", "ko‘krak va dum", "faqat ko'krak", "faqat dumg'aza"],
+                    correct: 1
+                },
+                {
+                    question: "Tabiiy egilishlar necha yoshgacha bo‘lgan bolalarda bo‘lmaydi?",
+                    options: ["bir yoshgacha", "ikki yoshgacha", "uch yoshgacha", "to'rt yoshgacha"],
+                    correct: 0
+                },
+                {
+                    question: "Umurtqa pog‘onasining normal rivojlanishida uning qismlari qanday holatda bo‘ladi?",
+                    options: ["To'liq to'g'ri holatda", "Bo‘yin va bel umurtqa pog‘onasi biroz oldinga, ko‘krak va dumg‘aza qismi biroz orqaga egilgan bo‘ladi", "Faqat bel qismi egilgan", "S-simon shaklda"],
+                    correct: 1
+                },
+                {
+                    question: "Bir-biriga parallel joylashgan bo‘lib, qisqarish xususiyatiga ega bo‘lgan muskul nomini ko‘rsating.",
+                    options: ["Ko'ndalang-targ'il muskul", "Yurak muskuli", "Silliq muskul", "Skelet muskuli"],
+                    correct: 2
+                },
+                {
+                    question: "Erkin qo‘l suyaklari soni nechta?",
+                    options: ["25 ta", "28 ta", "30 ta", "32 ta"],
+                    correct: 2
+                },
+                {
+                    question: "Somatotrop gormoni kamayib ketsa qanday kasallik kelib chiqadi?",
+                    options: ["Gigantizm", "Akromegaliya", "Nanizm", "Semizlik"],
+                    correct: 2
+                },
+                {
+                    question: "Odamlardagi yassioyoqda oyoqning qaysi yuzasi kengayadi?",
+                    options: ["tovon-kaft yuzasi", "oyoq usti yuzasi", "boldir yuzasi", "son yuzasi"],
+                    correct: 0
+                },
+                {
+                    question: "Uzoq vaqt poshnasiz oyoq kiyim kiyish oyoq kaftida qanday o‘zgarishga olib kelishi mumkin?",
+                    options: ["Mushaklarning kuchayishiga", "Yassioyoqlilik", "Suyaklarning sinishiga", "Barmoqlarning qiyshayishiga"],
+                    correct: 1
+                },
+                {
+                    question: "Uzun naysimon suyaklar qatoriga kirmaydigan suyaklarni aniqlang. a) bilak; b) yelka; c) o‘mrov; d) kaft; e) qovurg‘a",
+                    options: ["a, b", "a, b, c", "c, d, e", "d, e"],
+                    correct: 2
+                },
+                {
+                    question: "Baland bo‘yli bo‘lmasa ham semizroq, kuchli, ko‘krak qafasi keng, oyoq-qo‘llari kaltaroq bo‘lgan insonlar qaysi tipga mansub bo‘ladi?",
+                    options: ["Astenik tip", "Normostenik tip", "Giperstenik tip", "Atletik tip"],
+                    correct: 2
+                },
+                {
+                    question: "“Raxit” kasalligi nima sababdan kelib chiqadi?",
+                    options: ["A vitamini yetishmasligi", "B vitamini yetishmasligi", "C vitamini yetishmasligi", "D vitamini yetishmasligi"],
+                    correct: 3
+                },
+                {
+                    question: "Ko‘krak kifozi bolaning necha oyligida rivojlanadi?",
+                    options: ["2-3 oyligida", "3-4 oyligida", "5-6 oyligida", "8-9 oyligida"],
+                    correct: 2
+                },
+                {
+                    question: "Skeletni qoplab turgan muskullar qanday ataladi?",
+                    options: ["silliq muskullar", "yurak muskullari", "ko‘ndalang targ‘il muskullar", "ichki organ muskullari"],
+                    correct: 2
+                },
+                {
+                    question: "Quyidagi qaysi gormonlar organizmning o‘sishi va rivojlanishiga ta’sir ko‘rsatadi?",
+                    options: ["insulin, adrenalin", "somatotrop, tiroksin", "testosteron, estrogen", "kortizol, glyukagon"],
+                    correct: 1
+                },
+                {
+                    question: "Plantografiya bu ...",
+                    options: ["Barmoq izini olish", "oyoq panja izini olish", "Kaft izini olish", "Tana o'lchamini olish"],
+                    correct: 1
+                },
+                {
+                    question: "Dermatoglifika bu ...",
+                    options: ["oyoq panja izini olish", "barmoq izini olish", "teri kasalliklarini o'rganish", "tana tuzilishini o'rganish"],
+                    correct: 1
+                },
+                {
+                    question: "O‘sish va rivojlanishning asosiy qonuniyatlarini ko‘rsating.",
+                    options: ["Faqat akseleratsiya", "uzluksizlik, akseleratsiya, geteroxronizm, individual rivojlanish", "Faqat geteroxronizm", "Faqat individual rivojlanish"],
+                    correct: 1
+                },
+                {
+                    question: "Boyd jadvali yordamida qaysi ko‘rsatgich aniqlaniladi?",
+                    options: ["tana vazni indeksi", "tana yuzasi", "mushak massasi", "yog' foizi"],
+                    correct: 1
+                },
+                {
+                    question: "Gavdaning muskul va yog‘ massasi qanday aniqlanadi?",
+                    options: ["Antropometriya yordamida", "Spirometriya yordamida", "Mateyka formulasi yordamida", "Dinamometriya yordamida"],
+                    correct: 2
+                },
+                {
+                    question: "Muskul to‘qimasining yallig‘lanishi nima deb ataladi?",
+                    options: ["Artrit", "Miozit", "Nevrit", "Tendinit"],
+                    correct: 1
+                },
+                {
+                    question: "Umurtqa pog‘onasining yon tomonga qiyshayishi nima deb ataladi?",
+                    options: ["Kifoz", "Lordoz", "Skolioz", "Osteoxondroz"],
+                    correct: 2
+                },
+                {
+                    question: "Yelka suyagi necha yoshda suyaklanadi?",
+                    options: ["15-18 yoshda", "18-20 yoshda", "20-25 yoshda", "25-30 yoshda"],
+                    correct: 2
+                },
+                {
+                    question: "Uzun naysimon suyaklarga qaysilar kiradi?",
+                    options: ["qovurg'a, to'sh", "yelka, bilak, son, boldir", "umurtqalar", "kaft suyaklari"],
+                    correct: 1
+                },
+                {
+                    question: "Kalta naysimon suyaklarga qaysilar kiradi?",
+                    options: ["son, boldir", "qo‘l va oyoqning kaft va barmoq suyaklari", "kurak, chanoq", "kalla suyaklari"],
+                    correct: 1
+                },
+                {
+                    question: "G‘ovak suyaklarga qaysilar kiradi?",
+                    options: ["yelka, bilak", "son, boldir", "qovurg‘a, to‘sh, o‘mrov", "barmoq suyaklari"],
+                    correct: 2
+                },
+                {
+                    question: "G‘alvirsimon suyaklarga qaysilar kiradi?",
+                    options: ["tepa, ensa suyaklari", "yuqorigi jag‘, peshona, ponasimon va g‘alvirsimon suyaklar", "kurak va chanoq suyaklari", "o'mrov suyagi"],
+                    correct: 1
+                },
+                {
+                    question: "Yassi suyaklarga qaysilar kiradi?",
+                    options: ["yelka, son", "qovurg'a, to'sh", "tepa, ensa, yuz, kurak va chanoq suyaklari", "kaft va barmoq suyaklari"],
+                    correct: 2
+                },
+                {
+                    question: "Kalla suyaklaridagi liqildoqlar bolaning necha yoshida to‘liq suyaklashadi?",
+                    options: ["6 oyligida", "1 yoshida", "1,5 yoshida", "2 yoshida"],
+                    correct: 2
+                },
+                {
+                    question: "Bolaning miya qutisining choklari necha yoshda hosil bo‘ladi?",
+                    options: ["2 yoshda", "3 yoshda", "4 yoshda", "5 yoshda"],
+                    correct: 2
+                },
+                {
+                    question: "Kalla suyaklari necha yoshlarda tez o‘sadi?",
+                    options: ["2-3, 5-6, 9-10 yoshlarda", "3-4, 6-8, 11-15 yoshlarda", "4-5, 8-10, 13-16 yoshlarda", "Faqat go'daklik davrida"],
+                    correct: 1
+                },
+                {
+                    question: "Bo‘yin lordozi bolaning nechchi oyligida rivojlanadi?",
+                    options: ["1,5-2 oyligida", "3-4 oyligida", "5-6 oyligida", "7-8 oyligida"],
+                    correct: 0
+                },
+                {
+                    question: "Bel lordozi bolaning nechchi oyligida rivojlanadi?",
+                    options: ["6-7 oyligida", "8-9 oyligida", "10-11 oyligida", "11-12 oyligida"],
+                    correct: 3
+                },
+                {
+                    question: "M.V.Chernoruskiy odam konstitutsiyasini nechta turga bo‘ladi?",
+                    options: ["ikki turga", "uch turga: astenik, normostenik va giperstenik", "to'rt turga", "besh turga"],
+                    correct: 1
+                },
+                {
+                    question: "Kasallik davri nechta bosqichlarga bo‘linadi?",
+                    options: ["2 ta", "3 ta: Yashirin (inkubatsion yoki latent) davri, kasallik boshlangan (prodromal) davri, kasallikni kuchaygan davri.", "4 ta", "5 ta"],
+                    correct: 1
+                },
+                {
+                    question: "A’zolar tizimining bir xil me’yorda rivojlanmasligiga nima deyiladi?",
+                    options: ["akseleratsiya", "retardatsiya", "o‘sish va rivojlanishning geteroxroniyasi", "adaptatsiya"],
+                    correct: 2
+                },
+                {
+                    question: "N.P.Gundobin tuzib bergan yoshlik davrlari sxemasiga ko‘ra kichik maktab yosh davri necha yoshlarni o‘z ichiga oladi?",
+                    options: ["6-10 yosh", "7-12 yosh", "8-13 yosh", "9-14 yosh"],
+                    correct: 1
+                },
+                {
+                    question: "N.P.Gundobin tuzib bergan yoshlik davrlari sxemasiga ko‘ra o‘rta maktab yosh davri necha yoshlarni o‘z ichiga oladi?",
+                    options: ["10-14 yosh", "11-15 yosh", "12-15 yosh", "13-16 yosh"],
+                    correct: 2
+                },
+                {
+                    question: "N.P.Gundobin tuzib bergan yoshlik davrlari sxemasiga ko‘ra katta maktab yosh davri qizlar uchun necha yoshlarni o‘z ichiga oladi?",
+                    options: ["14-17 yosh", "15-18 yosh", "16-19 yosh", "17-20 yosh"],
+                    correct: 1
+                },
+                {
+                    question: "N.P.Gundobin tuzib bergan yoshlik davrlari sxemasiga ko‘ra katta maktab yosh davri o‘g‘il bolalar uchun necha yoshlarni o‘z ichiga oladi?",
+                    options: ["14-18 yosh", "15-19 yosh", "15-20 yosh", "16-21 yosh"],
+                    correct: 2
+                }
+            ],
+            "2.5": [
+                {
+                    question: "Quyidagilardan qaysi biri favqulodda vaziyatlarni kelib chiqishi bo‘yicha tasnifi hisoblanadi?",
+                    options: ["Iqtisodiy, ijtimoiy, siyosiy", "tabiiy, antropogen, tabiiy-texnogen, texnogen-tabiiy", "Kichik, o'rta, katta", "Mahalliy, regional, global"],
+                    correct: 1
+                },
+                {
+                    question: "Zilzila vaqtida birlamchi qoida, bu......",
+                    options: ["Tashqariga chiqish", "vahimaga tushmaslik", "Yugurish", "Baqirish"],
+                    correct: 1
+                },
+                {
+                    question: "Quyidagilardan antropogen tusdagi favqulodda vaziyatlarni aniqlang?",
+                    options: ["Zilzila, suv toshqini", "transport avariyalari va halokatlari", "Qurg'oqchilik, bo'ron", "Epidemiyalar"],
+                    correct: 1
+                },
+                {
+                    question: "Tasnifiga ko‘ra ....................gidrometeorologik turdagi favqulodda vaziyatlarga kiradi.",
+                    options: ["yong'inlar", "kuchli shamollar", "portlashlar", "kimyoviy zararlanish"],
+                    correct: 1
+                },
+                {
+                    question: "Quyidagilarning qaysi biri antropogen tusdagi favqulodda vaziyat hisoblanadi.",
+                    options: ["sel", "do'l", "gidrotexnik avariyalar", "ko'chki"],
+                    correct: 2
+                },
+                {
+                    question: "Ijtimoiy yo‘nalishdagi binolar konstruksiyalarini to‘satdan buzilishi oqibatida kelib chiqadigan avariyalar................ hisoblanadi.",
+                    options: ["tabiiy tusdagi favqulodda vaziyatlar", "antropogen tusdagi favqulodda vaziyatlar", "ekologik favqulodda vaziyatlar", "texnogen-tabiiy favqulodda vaziyatlar"],
+                    correct: 1
+                },
+                {
+                    question: "Favqulodda vaziyatlardan fuqarolarni himoya qilishning eng samarali usullaridan biri ......................",
+                    options: ["favqulodda vaziyatlardan ogohlantirish", "evakuatsiya qilish", "yashirinish", "birinchi yordam ko'rsatish"],
+                    correct: 0
+                },
+                {
+                    question: "Jabrlanganga birinchi yordamni ko‘rsatishda amalga oshiriladigan harakat bu.......",
+                    options: ["darhol shifoxonaga olib borish", "jabrlanganning organizmiga xavfli va zararli omillar ta’sirini bartaraf qilish", "jabrlanuvchining yaqinlariga xabar berish", "faqat suv berish"],
+                    correct: 1
+                },
+                {
+                    question: "Shikastlangan fuqaroning qon tomir ustiga jgut qancha vaqtgacha qo‘yilishi shart?",
+                    options: ["30 daqiqa", "1 soat", "jgut yoz oylarida uzog‘i bilan 1,5-2 soat, qish oylarida esa, 1-1,5 soat muddatga", "cheklanmagan muddatga"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Respublikasining “Fuqaro muhofazasi to‘g‘risida” gi qonuni qachon qabul qilindi?",
+                    options: ["1999-yil 26-may", "2000-yil 26-may", "2001-yil 26-may", "2002-yil 26-may"],
+                    correct: 1
+                },
+                {
+                    question: "3 ballik zilzilada qanday o‘zgarishlar kuzatiladi?",
+                    options: ["kuchli, binolar qimirlaydi", "kuchsiz, ko‘pchilik odamlar sezmaydi", "juda kuchli, binolar buziladi", "o'rtacha, hamma sezadi"],
+                    correct: 1
+                },
+                {
+                    question: "Yer necha ball qimirlaganda juda kuchli hisoblanib, ko‘pchilik odamlarni qo‘rquv bosadi, ular ko‘chaga yugurib chiqadilar, hatto uni haydovchilar ham sezadilar?",
+                    options: ["5-ball", "6-ball", "7-ball", "8-ball"],
+                    correct: 2
+                },
+                {
+                    question: "Xavfsizlik bu ... .",
+                    options: ["xavf-xatarning yo'qligi", "insonlarning xavf-xatardan himoyalanganlik darajasi", "qo'rqmaslik holati", "maxsus vositalardan foydalanish"],
+                    correct: 1
+                },
+                {
+                    question: "Jarohat deb nimaga aytiladi?",
+                    options: ["kasallikning boshlanishi", "tana a’zolarining va to‘qimalarining kutilmagan holatda tashqi ta’sir ostida shikastlanishi", "ruhiy zo'riqish", "charchoq alomati"],
+                    correct: 1
+                },
+                {
+                    question: "Hayot faoliyati xavfsizligi tushunchasi to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat texnika xavfsizligi", "insonni har qanday muhitdagi faoliyatida uning xavfsizligi va sog‘ligini ta’minlovchi, xavfli va zararli omillardan himoya qiluvchi amaliyot va nazariyani qamrab olgan ilmiy bilimlar", "Yong'in xavfsizligi qoidalari", "Yo'l harakati qoidalari"],
+                    correct: 1
+                },
+                {
+                    question: "Hayot faoliyati xavfsizligi metodi deb nimaga aytiladi?",
+                    options: ["Xavfni bartaraf etish", "Xavfni oldini olish", "texnotizimlarning xavfsizlik ko‘rsatgichlari, darajalari va optimallashtirish yo‘llarini o‘rganish, aniqlash va amalga oshirish usuli", "Xavfdan qochish"],
+                    correct: 2
+                },
+                {
+                    question: "Sport zalidagi jihozlar qanday talablarga javob berishi lozim?",
+                    options: ["Faqat chiroyli bo'lishi", "Faqat arzon bo'lishi", "gigienik, standart talablariga va xavfsizlik texnikasi talablariga", "Faqat yangi bo'lishi"],
+                    correct: 2
+                },
+                {
+                    question: "Binolar necha yilda va kim tomonidan texnik ko‘rikdan o‘tkazilishi kerak?",
+                    options: ["uch yilda bir marta sport qo'mitasi tomonidan", "bir yilda bir marta ta’lim muassasasi rahbari tasdiqlagan komissiya tomonidan", "besh yilda bir marta hokimiyat tomonidan", "har oyda bir marta o'qituvchi tomonidan"],
+                    correct: 1
+                },
+                {
+                    question: "Xavfsizlik nuqtai nazaridan sport zal pol yuzasi qanday bo‘lishi kerak?",
+                    options: ["sirpanchiq bo'lishi kerak", "tekis bo‘lishi, yoriq joylari bo‘lmasligi kerak", "yumshoq bo'lishi kerak", "qattiq beton bo'lishi kerak"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalining shift qismi qanday bo‘yoqda bo‘yalgan bo‘lishi lozim?",
+                    options: ["emulsiya bo'yoqda", "moyli bo‘yoqda", "akril bo'yoqda", "bo'yalmagan bo'lishi kerak"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalining isitish tizimiga qo‘yilgan xavfsizlik talablari to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Ochiq bo'lishi kerak", "devor sathida tekis o‘rnatilib maxsus yog‘och panjaralar bilan qoplangan bo‘lishi kerak", "Yuqorida joylashgan bo'lishi kerak", "Pastda joylashgan bo'lishi kerak"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalining derazasi poldan kamida necha metr balandlikda joylashgan bo‘lishi lozim?",
+                    options: ["1-metr", "1,5-metr", "2-metr", "2,5-metr"],
+                    correct: 1
+                },
+                {
+                    question: "Sport zalida muntazam ravishda harorat necha gradus bo‘lishi kerak?",
+                    options: ["15-17", "16-18", "18–20", "20-22"],
+                    correct: 2
+                }
+            ],
+            "3.2": [
+                {
+                    question: "Sport tushunchasi to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat jismoniy mashqlar majmui", "Sog‘lom turmush tarzining bir qismi", "shaxsiy musobaqa faoliyati shu faoliyat asosidan kelib chiqadigan maxsus tayyorgarlik hamda uning norma va yutuqlari tushuniladi", "Professional sportchilarning kasbiy faoliyati"],
+                    correct: 2
+                },
+                {
+                    question: "Sport musobaqalari deb nimaga aytiladi?",
+                    options: ["Sportchilarning dam olishi", "ko‘rsatish uslubi, sport yutuqlarini baholash va taqqoslash, sport soxasidagi raqobatni o‘ziga nisbatan boshqarishdir", "Tomoshabinlar uchun shou", "Sportchilarning mashg'uloti"],
+                    correct: 1
+                },
+                {
+                    question: "Nazariya deb nimaga aytiladi?",
+                    options: ["Amaliy mashg'ulotlar", "sohadagi tajribalarni umumlashtiruvchi, tabiat qonunlarini, ob'ektiv ravishda ko‘rsatishi asosiy bilimlarni inson ongida namoyon bo‘lishi", "Shaxsiy fikr va mulohazalar", "Faqat faktlar yig'indisi"],
+                    correct: 1
+                },
+                {
+                    question: "Sport o‘yinlaridan qaysi birida asosan chaqqonlik sifatini yetakchi fazilat sanaladi?",
+                    options: ["og'ir atletika", "basketbol", "yugurish", "suzish"],
+                    correct: 1
+                },
+                {
+                    question: "Kuchni rivojlantirish uchun mashqlarni necha yoshdan tavsiya etish mumkin?",
+                    options: ["5-7 yoshdan", "8-10 yoshdan", "11-13 yoshdan", "14-16 yoshdan"],
+                    correct: 1
+                },
+                {
+                    question: "Tezkorlik deb nimaga aytiladi?",
+                    options: ["Uzoq vaqt charchamasdan harakat qilish qobiliyati", "sportchining ma'lum sharoitda qisqa vaqt ichida eng ko‘p harakatlarni bajara olish qobiliyatiga", "Katta kuch bilan harakat qilish qobiliyati", "Harakatlarni katta amplitudada bajarish qobiliyati"],
+                    correct: 1
+                },
+                {
+                    question: "Chidamlilik deb nimaga aytiladi?",
+                    options: ["Qisqa vaqtda maksimal kuch sarflash qobiliyati", "Harakatlarni katta amplitudada bajara olish qobiliyati", "muskul faoliyati jarayonida vujudga keladigan tolishga organizmning qarshi turish qobiliyatiga", "Murakkab harakatlarni tez o‘zlashtirish qobiliyati"],
+                    correct: 2
+                },
+                {
+                    question: "Chaqqonlik rivojlantirish uchun mashqlarni necha yoshdan tavsiya etish mumkin?",
+                    options: ["5-6 yoshdan", "7-10 yoshdan", "11-12 yoshdan", "13-15 yoshdan"],
+                    correct: 1
+                },
+                {
+                    question: "Texnik tayyorgarlik deb nimaga aytiladi?",
+                    options: ["Sportchining jismoniy holati", "sportchi tomonidan mazkur sport turi xususiyatlariga mos va yuksak sport natijalariga erishishga yo‘naltirilgan harakatlar tizimini o‘zlashtirganlik darajasi", "Sportchining psixologik tayyorgarligi", "Sportchining nazariy bilimlari"],
+                    correct: 1
+                },
+                {
+                    question: "Quyosh, havo va suv jismoniy tarbiyaning asosiy vositatalarining qaysi biriga kiradi?",
+                    options: ["jismoniy mashqlarga", "gigiyenik omillarga", "tabiatni sog‘lomlashtiruvchi kuchlariga", "qo'shimcha vositalarga"],
+                    correct: 2
+                },
+                {
+                    question: "Dastlabki holat deb nimaga aytiladi?",
+                    options: ["mashqning eng oxirgi qismi", "mashqlar ijrosi boshlanishi oldidan turishlar va boshqa holatlar", "mashqning eng qiyin qismi", "mashqning o'rtasidagi tanaffus"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiya mashg‘ulotining tayyorlov qismining vazifasi nimadan iborat?",
+                    options: ["Organizmni tinchlantirish", "organizmni darsning asosiy qismiga tayyorlab berish", "Asosiy yuklamani berish", "Natijalarni baholash"],
+                    correct: 1
+                },
+                {
+                    question: "Harakatchan egiluvchanlik qanday amalga oshiriladi?",
+                    options: ["Statik holatda turish orqali", "katta amplitudada mashqlar bajaruvchi sportchining qobiliyatlarini baholash yo‘li orqali", "Kichik yuklamalar bilan", "Faqat isinish mashqlari bilan"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy madaniyat deb nimaga aytiladi?",
+                    options: ["Faqat sport bilan shug'ullanish", "umumiy madaniyatning bir qismi, jamiyatning ijtimoiy-tarixiy amaliyot jarayonida to‘plangan inson jismoniy kamoloti sohasidagi moddiy va ma’naviy boyliklari majmuasiga", "Sog'lom ovqatlanish qoidalari", "Shaxsiy gigiyena"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy rivojlanishning ta’rifi keltirilgan javobni toping?",
+                    options: ["Faqat bo'yning o'sishi", "Kishi organizmi shakl va funksiyalarining o‘zgarish jarayoni", "Faqat vaznning ortishi", "Bilim darajasining oshishi"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiyaning asosiy vositalari to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["jismoniy mashqlar, gigiyenik omillar, tabiatning sog‘lomlashtiruvchi kuchlari", "Faqat jismoniy mashqlar", "Sport anjomlari va kiyimlari", "Darsliklar va o‘quv qo‘llanmalar"],
+                    correct: 0
+                },
+                {
+                    question: "Maktab jismoniy tarbiya darsining vazifalari to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat sog'lomlashtirish", "Faqat ta'limiy va tarbiyaviy", "sog‘lomlashtirish, ta’limiy, tarbiyaviy", "Faqat musobaqaga tayyorlash"],
+                    correct: 2
+                },
+                {
+                    question: "Bolalar yosh xususiyatlari va imkoniyatlarini hisobga olgan holda qanday o‘rgatish metodlaridan foydalaniladi?",
+                    options: ["Faqat amaliy metod", "Faqat og'zaki metod", "ko‘rgazmali, og‘zaki, amaliy, o‘yin, musobaqa", "Faqat o'yin metodi"],
+                    correct: 2
+                },
+                {
+                    question: "Ko‘rgazmali metod deb nimaga aytiladi?",
+                    options: ["Faqat tushuntirish", "hissiy idrok va harakat sezgilarining yorqinligini ta’minlash jarayoni", "Faqat mashq bajarish", "Faqat o'yin o'ynash"],
+                    correct: 1
+                },
+                {
+                    question: "Amaliy metod deb nimaga aytiladi?",
+                    options: ["Faqat ko'rsatib berish", "o‘z mushak motor sezgilarida to‘g‘ri idrok etilishini amalda tekshirishni ta’minlaydi", "Faqat suhbatlashish", "Faqat nazariy ma'lumot berish"],
+                    correct: 1
+                },
+                {
+                    question: "O‘yin metodi deb nimaga aytiladi?",
+                    options: ["Qat'iy qoidalarga asoslangan mashqlar", "bolalar bilan ishlashda samarali bo‘lib, ko‘rgazmali obraz va ko‘rgazmali amaliy tafakkur elementlarini hisobga oladi", "Faqat yakka tartibdagi mashg'ulot", "Faqat jiddiy mashqlar"],
+                    correct: 1
+                },
+                {
+                    question: "Musobaqa metodini toping.",
+                    options: ["Dam olishni tashkil etish", "bolalarga ta’lim berishda u faqat pedagogik raxbarlik sharoitida qo‘llanilishi mumkin bo‘lgan jarayon", "Shunchaki vaqt o'tkazish", "Hech qanday maqsadsiz harakat"],
+                    correct: 1
+                },
+                {
+                    question: "Usul deb nimaga aytiladi?",
+                    options: ["Metod bilan bir xil tushuncha", "metodning bir qismi, uni to‘ldiruvchi va aniqlashtiruvchi qismi", "Metodga qarama-qarshi tushuncha", "Umumiy pedagogik yondashuv"],
+                    correct: 1
+                },
+                {
+                    question: "Sog‘lomlashtirishga yo‘nalgan tamoyilning mazmun-mohiyati to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat sport natijalariga erishish", "bolalar sog‘ligini mustahkamlash vazifalarini bajarish", "Faqat kasalliklarni davolash", "Faqat jismoniy sifatlarni rivojlantirish"],
+                    correct: 1
+                },
+                {
+                    question: "Onglilik, faollik va mustaqillik tamoyillari mazmun-mohiyati to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat o'qituvchining ko'rsatmalarini bajarish", "bolaning o‘z faoliyatiga ongli va faol munosabatda bo‘lishga tayanishi", "Faqat majburiy mashqlarni bajarish", "Passiv ishtirok etish"],
+                    correct: 1
+                },
+                {
+                    question: "Bilish faoliyati deganda nimani tushunasiz?",
+                    options: ["Faqat amaliy harakatlar", "hissiy bilish jarayonlarini amaliyot bilan birligi", "Faqat nazariy bilimlar", "Faqat eslab qolish"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiyada hosil qilinayotgan harakat ko‘nikmalari qanday hosil bo‘ladi?",
+                    options: ["Bir marta bajarish bilan", "takrorlanishini talab etadi", "Faqat ko'rish orqali", "O'z-o'zidan hosil bo'ladi"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy mashq deb nimaga aytiladi?",
+                    options: ["Har qanday harakat", "jismoniy tarbiya qonuniyatlari talablariga javob beruvchi, ongli ravishda bajariladigan ixtiyoriy harakat faoliyatlarining turli turkumi tushuniladi", "Faqat sport zalida bajariladigan harakatlar", "Reflektor harakatlar"],
+                    correct: 1
+                },
+                {
+                    question: "Saf mashqlari qanday harakatlardan tashkil topgan?",
+                    options: ["Yakka tartibda bajariladigan harakatlar", "safda birgalikda bajariladigan, shug‘ullanganda uyushqoqlik va intizomni, jamoa bo‘lib harakat qilish malakalarini, qad-qomatni, shuningdek ritm va sur’at hissini tarbiyalashga yordamlashadigan harakatlar", "Faqat yugurish va sakrash", "Erkin harakatlar"],
+                    correct: 1
+                },
+                {
+                    question: "Umumrivojlantiruvchi mashqlar qanday mashqlardan tashkil topgan?",
+                    options: ["Faqat kuch ishlatiladigan mashqlar", "ko‘proq bo‘g‘inlarda bajariladigan, jismoniy yuklamaga tayyorgarlik, organizmning funksional imkoniyatlarini kengaytirish va qaddi-qomatni tarbiyalash uchun qo‘llaniladigan mashqlar", "Faqat tezlikni oshiradigan mashqlar", "Faqat dam olishga qaratilgan mashqlar"],
+                    correct: 1
+                },
+                {
+                    question: "Harakatni koordinatsiyalash, yangi harakatlarni egallash, bir harakatdan ikkinchisiga tez o‘ta olish qobiliyati qanday sifatni bildiradi?",
+                    options: ["kuch", "tezkorlik", "chidamlilik", "chaqqonlik"],
+                    correct: 3
+                },
+                {
+                    question: "Yaxlit o‘rgatish usuli deganda nimani tushunasiz?",
+                    options: ["Harakatni qismlarga bo'lib o'rgatish", "harakat faoliyatini o‘rgatishning yakuniy vazifasi qanday ko‘rinishda bo‘lsa, shunday o‘rganishni nazarda tutadi", "Faqat nazariy tushuntirish", "Harakatni sekinlashtirib o'rgatish"],
+                    correct: 1
+                },
+                {
+                    question: "Qismlarga bo‘lib o‘rgatish usuli deganda nimani tushunasiz?",
+                    options: ["Harakatni bir butun holda o'rgatish", "harakat faoliyatining alohida qismlarini dastlab o‘rgatib, keyin zarur yaxlit harakatni tiklashni ko‘zda tutadi", "O'yin usulidan foydalanish", "Musobaqa usulidan foydalanish"],
+                    correct: 1
+                },
+                {
+                    question: "Musobaqa usulida mashg‘ulotlarni olib borish qanday maqsadlarda qo‘llaniladi?",
+                    options: ["Faqat dam olish uchun", "jismoniy qobiliyatlar, irodaviy hamda ma’naviy sifatlarni rivojlantirish, texnik-taktik harakatlarni takomillashtirish maqsadlarida", "Faqat vaqt o'tkazish uchun", "Yangi o'quvchilarni jalb qilish uchun"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy mashqlarni tanlashda nimaga e’tibor berish kerak?",
+                    options: ["Faqat o'qituvchining xohishiga", "bola organizmini har tomonlama sog‘lomlashtirishga intilish, uning jismoniy sifatlarini hissiy-ijobiy holat, hayotdagi xushchaqchaq kayfiyat bilan yaxlitlikda rivojlantirishga", "Faqat mashqlarning murakkabligiga", "Faqat mavjud anjomlarga"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiya deb nimaga aytiladi?",
+                    options: ["Sport musobaqalariga tayyorgarlik ko‘rish", "jismoniy kamolotga erishishga yo‘naltirilgan pedagogik jarayon", "Sog‘liqni saqlash choralari", "Faqat ertalabki badantarbiya"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiya mashg‘uloti (darsi) necha qismga bo‘linadi?",
+                    options: ["2", "3", "4", "5"],
+                    correct: 1
+                },
+                {
+                    question: "“Mashg‘ulot” deb nimaga aytiladi?",
+                    options: ["Shunchaki vaqt o'tkazish", "ikki tomonlama, to‘g‘ri tashkil etilgan, ma’lum bir vaqt bilan chegaralangan, maqsad va vazifalarga ega bo‘lgan pedagogik jarayon", "Faqat o'qituvchining faoliyati", "Faqat o'quvchining faoliyati"],
+                    correct: 1
+                },
+                {
+                    question: "“Jismoniy kamolot” deb nimaga aytiladi?",
+                    options: ["Faqat jismoniy kuchlilik", "bu jismoniy rivojlanishning tarixan shakllangan darajasi va sog‘liqning, hayotga, mehnatga va vatan himoyasiga har tomonlama jismoniy tayyorlanganlikning eng yuqori bosqichi", "Faqat sportdagi yutuqlar", "Faqat chiroyli qad-qomat"],
+                    correct: 1
+                },
+                {
+                    question: "Sog‘lomlashtirishga yo‘nalgan tamoyilining mohiyati to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat sport natijalariga erishish", "bolalar sog‘ligini mustahkamlash", "Faqat kasalliklarni davolash", "Faqat bilim berish"],
+                    correct: 1
+                },
+                {
+                    question: "O‘quvchilarning bilimlarini oshirish, malaka va ko‘nikmalarni egallash uchun ta’lim metodlari necha guruhga ajratiladi?",
+                    options: ["2", "3", "4", "5"],
+                    correct: 1
+                },
+                {
+                    question: "O‘qitishning metodlari to‘liq ko‘rsatilgan qatorni toping?",
+                    options: ["Faqat so'zdan foydalanish metodi", "so‘zdan foydalanish metodi, ko‘rgazmali hisqilish metodi, amaliy metodi", "Faqat amaliy metod", "Faqat ko'rgazmali metod"],
+                    correct: 1
+                },
+                {
+                    question: "Gigiyenik omillarning ahamiyati to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Sport natijalarini pasaytiradi", "barcha organ va tizimlarning yaxlit ishlashiga yordam beradi", "Mashg'ulot samarasini kamaytiradi", "Hech qanday ahamiyatga ega emas"],
+                    correct: 1
+                },
+                {
+                    question: "Tabiatning tabiiy kuchlari qanday ahamiyatga ega?",
+                    options: ["jismoniy mashqlarning organizmga ta’sirini kuchaytiradi va kishi ish qobiliyatini oshiradi", "Organizmga salbiy ta'sir ko'rsatadi", "Hech qanday ahamiyatga ega emas", "Faqat chiniqish uchun xizmat qiladi"],
+                    correct: 0
+                },
+                {
+                    question: "Raqs mashqlarining ahamiyati to‘g‘ri ko‘rsatilgan qatorni belgilang?",
+                    options: ["Faqat kayfiyatni ko'taradi", "organizmning barcha tizimlariga ta’sir qiladi,jismoniy fazilatlarni rivojlantiradi, harakatlar nafis, erkin ifodali bo‘la boradi, ijobiy hislar paydo qiladi, qad-qomatning to‘g‘ri shakllanishiga yordam beradi", "Faqat egiluvchanlikni rivojlantiradi", "Faqat vaqtni o'tkazish uchun"],
+                    correct: 1
+                }
+            ],
+            "3.3": [
+                {
+                    question: "Tayanib sakrash nechta fazaga bo‘linadi?",
+                    options: ["2 ta fazaga", "3 ta fazaga", "4 ta fazaga", "5 ta fazaga"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada qanday yo‘nalishlar bor?",
+                    options: ["Faqat sport va badiiy", "sog‘lamlashtiruvchi, sport, amaliy", "Akrobatik, ritmik, kuch", "Asosiy, yordamchi, qo‘shimcha"],
+                    correct: 1
+                },
+                {
+                    question: "Gimnastika darsi necha qismdan iborat bo‘ladi?",
+                    options: ["Ikki", "Uch", "To'rt", "Besh"],
+                    correct: 1
+                },
+                {
+                    question: "Gimnastik arqonning uzunligi qancha bo‘ladi?",
+                    options: ["1-2 m", "2-3 m", "3-4 m", "4-6 m"],
+                    correct: 3
+                },
+                {
+                    question: "Maktab o‘quvchilariga qanday og‘irlikdagi gantellar tavsiya etiladi ?",
+                    options: ["1-2 kg", "2-5 kg", "3-8 kg", "8-10 kg"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastik arqonga chiqishning necha xil usuli bor ?",
+                    options: ["bir xil", "ikki xil", "uch xil", "to‘rt xil"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada osilish atamasiga ta’rif bering?",
+                    options: ["gimnastning yelkasi snaryad o‘qidan yuqorida bo‘lishi kerak", "gimnastning yelkasi snaryad o‘qi bilan bir sathda bo‘lishi kerak", "gimnastning yelkasi snaryad o‘qidan pastda bo‘lishi kerak", "gimnastning snaryadga tayanib turishi"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada tayanish atamasiga ta’rif bering?",
+                    options: ["gimnastning yelkasi snaryad o‘qidan pastda bo‘lishi kerak", "gimnastning yelkasi snaryad o‘qidan yuqorida bo‘lishi kerak", "gimnastning snaryaddan osilib turishi", "gimnastning snaryad yonida turishi"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiyada qanday tibbiy guruhlar bor?",
+                    options: ["sog'lom, kasal", "asosiy, tayyorlov, maxsus", "sportchi, havaskor", "A, B, C guruhlar"],
+                    correct: 1
+                },
+                {
+                    question: "Gimnastikada “tutish” atamasini izohlang?",
+                    options: ["jihozdan sakrash", "jihozni ushlash usuli", "jihozda aylanish", "jihozga chiqish"],
+                    correct: 1
+                },
+                {
+                    question: "Sport gimnastikasi bo‘yicha erkaklar o‘rtasidagi 1-jahon chempionati qayerda o‘tkazilgan?",
+                    options: ["Fransiyada", "Germaniyada", "Belgiyada", "Shvetsariyada"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada “o‘tirish” atamasini izohlang?",
+                    options: ["jihozda o‘tirgan holat", "jihozda tik turish", "jihoz yonida o'tirish", "jihozdan tushish"],
+                    correct: 0
+                },
+                {
+                    question: "Gimnastikada “pastga tashlanish” atamasini izohlang?",
+                    options: ["ko‘tarilishga teskari harakat", "sakrash harakati", "aylanish harakati", "muvozanatni saqlash"],
+                    correct: 0
+                },
+                {
+                    question: "Kichik sport gimnastika zalining o‘lchami qancha?",
+                    options: ["18 x 9 m", "24 x 12 m", "30 x 15 m", "36 x 18 m"],
+                    correct: 1
+                },
+                {
+                    question: "Katta gimnastika zalining o‘lchami qancha?",
+                    options: ["24 x 12 m", "30 x 15 m", "36 x 18 m", "42 x 24 m"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastika zali havosining namligi qancha bo‘lishi kerak?",
+                    options: ["30-40 %", "40-50 %", "50-60 %", "60-70 %"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada nech xil dars zichligi bor?",
+                    options: ["1 xil", "2 xil", "3 xil", "4 xil"],
+                    correct: 1
+                },
+                {
+                    question: "Gimnastikada qanday dars zichliklari bor?",
+                    options: ["Faqat umumiy zichlik", "Umumiy zichlik, motor zichlik", "Faqat motor zichlik", "Yuqori va past zichlik"],
+                    correct: 1
+                },
+                {
+                    question: "Gimnastika skameykasining uzunligi qancha bo‘ladi?",
+                    options: ["2 m", "3 m", "4 m", "5 m"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastik xalqalar orasi qancha bo‘ladi?",
+                    options: ["40 sm", "45 sm", "50 sm", "55 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Dastakli otning uzunligi qancha bo‘ladi?",
+                    options: ["140 sm", "150 sm", "160 sm", "170 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Qo‘shpoya (brusya) yog‘ochlarining uzunligi qancha bo‘ladi?",
+                    options: ["300 sm", "320 sm", "350 sm", "380 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Past-baland qo‘shpoya (brusya) kimlar uchun mo‘ljallangan?",
+                    options: ["erkaklar uchun", "bolalar uchun", "xotin-qizlar uchun", "barchaga"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastik turnikning eni qancha bo‘ladi?",
+                    options: ["200 sm", "220 sm", "240 sm", "250 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastikada erkin mashqlar uchun maydonning o‘lchamlari qancha bo‘ladi?",
+                    options: ["10 x 10 m", "12 x 12 m", "14 x 14 m", "16 x 16 m"],
+                    correct: 1
+                },
+                {
+                    question: "Yakkacho‘p (brevno)ning uzunligi qancha bo‘ladi?",
+                    options: ["4 m", "4.5 m", "5 m", "5.5 m"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastika yakkacho‘pi kimlarga mo‘ljallangan?",
+                    options: ["faqat ayollarga", "faqat erkaklarga", "faqat bolalarga", "barchaga"],
+                    correct: 3
+                },
+                {
+                    question: "To‘ldirma to‘pning og‘irligi qancha bo‘ladi?",
+                    options: ["0.5-2 kg", "1-5 kg", "3-7 kg", "5-10 kg"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy tarbiyada maxsus tibbiy guruhlarga qanday o‘quvchilar kiritiladi?",
+                    options: ["jismonan sog'lom o'quvchilar", "sport bilan shug'ullanadigan o'quvchilar", "har xil kasallikka chalingan o‘quvchilar", "tayyorlov guruhidagi o'quvchilar"],
+                    correct: 2
+                },
+                {
+                    question: "Maktablarda gimnastika darsining asosiy qismi qancha davom etishi kerak?",
+                    options: ["15-20 daqiqa", "20-25 daqiqa", "28-30 daqiqa", "35-40 daqiqa"],
+                    correct: 2
+                },
+                {
+                    question: "Gimnastika musobaqasi paytida qo‘pol xato uchun necha ball kamaytirilishi mumkin?",
+                    options: ["0,1 ball", "0,2-0,3 ball", "0,4-0,5 ball", "1 ball"],
+                    correct: 2
+                },
+                {
+                    question: "“Gimnastika” atamasi qanday ma’noni bildaradi?",
+                    options: ["“Kuchli”", "“Chaqqon”", "“Yalang‘och”", "“Egiluvchan”"],
+                    correct: 2
+                },
+                {
+                    question: "Sport gimnastikasida erkaklarga asosiy snaryadlar soni nechta?",
+                    options: ["4 ta", "5 ta", "6 ta", "7 ta"],
+                    correct: 2
+                },
+                {
+                    question: "Sport gimnastikasida ayollarda asosiy snaryadlar soni nechta?",
+                    options: ["3 ta", "4 ta", "5 ta", "6 ta"],
+                    correct: 1
+                },
+                {
+                    question: "Lochinlar gimnastika tizimi qayerda paydo bo‘lgan?",
+                    options: ["Germaniyada", "Shvetsiyada", "Fransiyada", "Chexiyada"],
+                    correct: 3
+                },
+                {
+                    question: "Yonma - yon qator bu nima",
+                    options: ["bir-birining orqasiga saflanish", "bir chiziqda elkama-elka saflanish", "doira bo'lib saflanish", "ikki qator bo'lib saflanish"],
+                    correct: 1
+                },
+                {
+                    question: "Bir oyoqda turg‘un holatni saqlash atamasini aniqlang",
+                    options: ["Sakrash", "Tayanish", "Muvozanat", "Osilish"],
+                    correct: 2
+                },
+                {
+                    question: "Ketma - ket qator bu nima ..?",
+                    options: ["bir chiziqda elkama-elka saflanish", "bir-birining orqasiga saflanib turish", "aylana bo'ylab turish", "shaxmat tartibida turish"],
+                    correct: 1
+                },
+                {
+                    question: "Xareografiya mashqlari qaysi gimnastika turiga kiradi?",
+                    options: ["sport gimnastikasi", "amaliy gimnastika", "badiiy gimnastika", "sog'lomlashtiruvchi gimnastika"],
+                    correct: 2
+                }
+            ],
+            "3.4": [
+                {
+                    question: "Xalqaro basketbol federatsiyasining qisqartirilgan nomini toping?",
+                    options: ["NBA", "FIBA", "UEFA", "BFA"],
+                    correct: 1
+                },
+                {
+                    question: "Osiyo basketbol federatsiyasining qisqartirilgan nomini toping?",
+                    options: ["FIBA Asia", "ABC", "AFC", "OBA"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston basketbol federatsiyasi qachon tashkil topgan?",
+                    options: ["1990-yil", "1991-yil", "1992-yil", "1993-yil"],
+                    correct: 2
+                },
+                {
+                    question: "Pok-ta-pok – qanday o‘yin?",
+                    options: ["qadimda Maya qabilasi o‘ynagan, basketbolga o‘xshash o‘yin nomi", "Afrikada o'ynaladigan to'p o'yini", "Qadimgi Rimdagi gladiatorlar o'yini", "Xitoyda an'anaviy o'yin"],
+                    correct: 0
+                },
+                {
+                    question: "Basket- so‘zining ma’nosini toping?",
+                    options: ["To‘p", "Maydon", "savat", "O‘yin"],
+                    correct: 2
+                },
+                {
+                    question: "Fint- so‘zining ma’nosini toping?",
+                    options: ["to'pni olib yurish", "chalg‘ituvchi harakatlar ma’nosini anglatadi", "to'pni savatga tashlash", "himoyadagi harakat"],
+                    correct: 1
+                },
+                {
+                    question: "Pressing- so‘zining ma’nosini toping?",
+                    options: ["hujum qilish usuli", "himoya harakatlarida raqiblarga zich qarshi harakat ko‘rsatish ma’nosini ifodalaydi", "to'pni o'yinga kiritish", "tanaffus olish"],
+                    correct: 1
+                },
+                {
+                    question: "Taym-aut - so‘zining ma’nosini toping?",
+                    options: ["o'yin vaqtining tugashi", "qo'shimcha vaqt", "jamoalar olishi mumkin bo‘lgan daqiqali tanaffusdir", "jarima zarbasi"],
+                    correct: 2
+                },
+                {
+                    question: "Xalqaro gandbol federatsiyasi qisqartirilgan nomini toping?",
+                    options: ["IAHF", "IHF", "AHF", "HFI"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston gandbol federatsiyasi qachon tashkil topgan?",
+                    options: ["1991-yil", "1992-yil 2-mart", "1993-yil", "1994-yil"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro voleybol federatsiyasi qisqartirilgan nomini toping?",
+                    options: ["VBF", "IVF", "FVB", "FIVB"],
+                    correct: 3
+                },
+                {
+                    question: "13-14 yoshli qizlar uchun voleybol to‘rining balandligi qancha?",
+                    options: ["2 m 00 sm", "2 m 05 sm", "2 m 10 sm", "2 m 15 sm"],
+                    correct: 2
+                },
+                {
+                    question: "17-18 yoshdan katta ayollar uchun voleybol to‘rning balandligi qanchaga teng?",
+                    options: ["2m 20 sm", "2m 24 sm", "2m 30 sm", "2m 35 sm"],
+                    correct: 1
+                },
+                {
+                    question: "17-18 yoshdan katta erkaklar uchun voleybol to‘rning balandligi qanchaga teng?",
+                    options: ["2m 35 sm", "2m 40 sm", "2m 43 sm", "2m 50 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Futbol maydonining o‘lchami qancha ?",
+                    options: ["eni 40-80 m, uzunligi 80-110 m", "Maydon eni 45-90 m, maydon uzunligi 90-120 m ga teng", "eni 50-100 m, uzunligi 100-130 m", "eni 60-110 m, uzunligi 110-140 m"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro Futbol Federatsiyasi qisqartirilgan nomini toping?",
+                    options: ["UEFA", "AFC", "FIFA", "UFA"],
+                    correct: 2
+                },
+                {
+                    question: "Basketbol shitining ulchami qancha?",
+                    options: ["100x150 sm", "105x180 sm", "110x190 sm", "120x200 sm"],
+                    correct: 1
+                },
+                {
+                    question: "Gandbol to‘pining ikkinchi o‘lchamdagi hajmi qancha bo‘ladi?",
+                    options: ["300 – 350 gr", "325 – 375 gr", "350 – 400 gr", "400 – 450 gr"],
+                    correct: 1
+                },
+                {
+                    question: "Voleybolda qaysi hududlarni hujum qilish maydoni deb hisoblash mumkin?",
+                    options: ["1, 6, 5", "2, 3, 4", "faqat 3", "faqat 2 va 4"],
+                    correct: 1
+                },
+                {
+                    question: "Futbol darvozasi ustunining diametri qancha?",
+                    options: ["10 sm", "11 sm", "12 sm", "15 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Basketbol sport turida 3 ochkolik to‘pni tashlash masofasi qancha qilib belgilangan?",
+                    options: ["625 sm", "650 sm", "675 sm", "700 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Basketbol o‘yinida xujum uchun nechi soniya belgilangan?",
+                    options: ["20 soniya", "22 soniya", "24 soniya", "30 soniya"],
+                    correct: 2
+                },
+                {
+                    question: "Regbi o‘yiniga qachon va qayerda asos solingan?",
+                    options: ["1823-yil Angliyada", "1845-yil Shotlandiyada", "1860-yil Fransiyada", "1880-yil AQSHda"],
+                    correct: 0
+                },
+                {
+                    question: "Basketbol halqasining diametri nechi santimetr ?",
+                    options: ["40 sm", "45 sm", "50 sm", "55 sm"],
+                    correct: 1
+                },
+                {
+                    question: "Voleybolda “Antena” uzunligi nechchi santimetrga teng ?",
+                    options: ["150 sm", "160 sm", "170 sm", "180 sm"],
+                    correct: 3
+                },
+                {
+                    question: "Voleybol o‘yini nechchi bo‘limdan iborat ?",
+                    options: ["3 bo'limdan", "4 bo'limdan", "5 bo‘limdan", "cheklanmagan"],
+                    correct: 2
+                }
+            ],
+            "3.5": [
+                {
+                    question: "Kurash xalqaro assotsiatsiyasi nechanchi yilda va nechta davlat vakillari ishtirokida tuzilgan?",
+                    options: ["1995-yil 25 ta davlat", "1998-yil 6-sentabr 28 ta davlat", "2000-yil 30 ta davlat", "1992-yil 20 ta davlat"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston kurash milliy federatsiyasi qachon ro‘yxatga olingan?",
+                    options: ["1991-yil 1-sentabr", "1992-yil 11-mart", "1993-yil 5-may", "1994-yil 1-yanvar"],
+                    correct: 1
+                },
+                {
+                    question: "Kurash xalqaro qoidalarini kim ishlab chiqqan?",
+                    options: ["A. Ortiqov", "R. Sobirov", "K.Yusupov", "A. Tangriev"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash xalqaro assotsiatsiyasining yuqori organi nima deb ataladi?",
+                    options: ["Ijroiya qo'mita", "Prezidium", "Kongress", "Kengash"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash bo‘yicha birinchi jahon chempionati qachon o‘tkazilgan?",
+                    options: ["1998-yil", "1999-yil may", "2000-yil", "2001-yil"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston sportchilaridan kurash bo‘yicha birinchi jahon chempionatida kimlar g‘oliblikni qo‘lga kiritgan?",
+                    options: ["Faqat A.Qurbonov", "Faqat K.Murodov", "A.Qurbonov, K.Murodov, T.Muxammadiyev", "Barchasi mag'lub bo'lgan"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash bo‘yicha Birinchi Osiyo chempionati qayerda o‘tkazilgan?",
+                    options: ["Toshkent", "Samarqand", "Termiz", "Buxoro"],
+                    correct: 2
+                },
+                {
+                    question: "Kurashda ikki daqiqa davomida gilamga chiqmasa qanday ogohlantirish beriladi?",
+                    options: ["tanbeh", "g'irrom", "dakki", "chelatish"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash gilamiga birinchi chaqirilayotgan kurashchi qaysi yaktakda chiqadi?",
+                    options: ["yashil", "qizil", "oq", "ko‘k"],
+                    correct: 3
+                },
+                {
+                    question: "Yoshlar uchun kurash gilami o‘lchami to‘g‘ri ko‘rsatilgan javobni belgilang?",
+                    options: ["8x8m", "10x10m", "12x12m", "14x14m"],
+                    correct: 1
+                },
+                {
+                    question: "Kurashchilar musobaqa boshlanishidan qancha vaqt oldin tarozida o‘lchanadi?",
+                    options: ["30 daqiqa", "1 soat", "2 soat", "3 soat"],
+                    correct: 2
+                },
+                {
+                    question: "Kurashda Halol bahosi to‘g‘ri ko‘rsatilgan qatorni toping?",
+                    options: ["3 baho", "5 baho", "10 baho", "Sof g'alaba"],
+                    correct: 2
+                },
+                {
+                    question: "O‘smirlar o‘rtasida o‘tkaziladigan musobaqalarda kurash necha minut davom etadi?",
+                    options: ["2 daqiqa", "3 daqiqa", "4 daqiqa", "5 daqiqa"],
+                    correct: 2
+                },
+                {
+                    question: "Kurashda faxriylar uchun olishuv vaqti qancha?",
+                    options: ["1 daqiqa", "2 daqiqa", "3 daqiqa", "4 daqiqa"],
+                    correct: 1
+                },
+                {
+                    question: "Kurash iboralari to‘g‘ri keltirilgan ketma ketligini ko‘rsating?",
+                    options: ["Ta'zim, kurash, to'xta, tanishing", "Tanishing, ta’zim, o‘rtaga, kurash", "O'rtaga, tanishing, kurash, ta'zim", "Kurash, to'xta, ta'zim, tanishing"],
+                    correct: 1
+                },
+                {
+                    question: "Kurashda Yonbosh bahosi to‘g‘ri ko‘rsatilgan qatorni toping ?",
+                    options: ["3 baho", "5 baho", "7 baho", "10 baho"],
+                    correct: 1
+                },
+                {
+                    question: "Kurash gilamida nechta hakam hakamlik qiladi ?",
+                    options: ["1 ta", "2 ta", "3 ta", "4 ta"],
+                    correct: 2
+                },
+                {
+                    question: "2025-yilda bo‘ladigan Yoshlar Osiyo o‘yinlari qaysi mamlakatda o‘tkaziladi?",
+                    options: ["Qozog'iston", "Xitoy", "Yaponiya", "O‘zbekiston"],
+                    correct: 3
+                },
+                {
+                    question: "Maktabda jismoniy tarbiya darslarida kurash nechanchi sinfdan boshlab o‘tiladi?",
+                    options: ["1-sinfdan", "3-sinfdan", "5-sinfdan", "7-sinfdan"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash milliy sport turini yanada rivojlantirish chora-tadbirlari to‘g‘risidagi PQ- 3306- son qarori qachon qabul qilingan?",
+                    options: ["02.10.2017 yil", "04.11.2020 yil", "05.03.2018 yil", "01.02.1999 yil"],
+                    correct: 0
+                },
+                {
+                    question: "1998-yil 6-sentabrda Yevropa, Osiyo va Amerikaning 28 davlat vakillari qanday tashkilotga asos soldi?",
+                    options: ["Jahon Kurash Federatsiyasi", "Osiyo Kurash Konfederatsiyasi", "Xalqaro kurash assotsatsiyasi", "Yevropa Kurash Ittifoqi"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash usullarini baholash atamalari to‘g‘ri ko‘rsatilgan javobni belgilang?",
+                    options: ["Tanbeh, Dakki, G'irrom", "Halol chala, yonbosh", "Ta'zim, Kurash, To'xta", "Barchasi noto'g'ri"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekistonda kurash federatsiyasi birinchi Prezidenti kim?",
+                    options: ["Salim Abduvaliyev", "K.Yusupov", "Alisher Sultonov", "Rustam Shoabdurahmonov"],
+                    correct: 1
+                },
+                {
+                    question: "Birinchi jaxon chempionatida mutloq vazn toifasida kim g‘olib bo‘lgan?",
+                    options: ["A.Qurbonov", "K.Murodov", "T.Muxammadiyev", "B.Xidirov"],
+                    correct: 2
+                },
+                {
+                    question: "Kurashda chala bahosi to‘g‘ri ko‘rsatilgan qatorni toping?",
+                    options: ["1 baho", "2 baho", "3 baho", "5 baho"],
+                    correct: 2
+                },
+                {
+                    question: "Kurashda ogohlantiruvchi atamalar to‘g‘ri ko‘rsatilgan qatorni toping?",
+                    options: ["Halol, Chala, Yonbosh", "tanbeh, dakki, g’irrom", "Ta'zim, Kurash, To'xta", "Barchasi to'g'ri"],
+                    correct: 1
+                }
+            ],
+            "3.6": [
+                {
+                    question: "Boshlangʻich sinf jismoniy tarbiya darslarida qaysi yonalishga koʻproq dars soati ajratilgan ?",
+                    options: ["gimnastika", "yengil atletika", "harakatli oʻyinlar", "sport o'yinlari"],
+                    correct: 2
+                },
+                {
+                    question: "Maktabda harakatli oʻyinlarning tashkilotchisi va boshqaruvchisi kim?",
+                    options: ["maktab direktori", "sinf rahbari", "jismoniy tarbiya fani oʻqituvchisi", "o'quvchilarning o'zi"],
+                    correct: 2
+                },
+                {
+                    question: "Harakatli oʻyinlar tanlashda jismoniy tarbiya oʻqituvchisi o‘quvchilarning nimasini inobatga olishi kerak?",
+                    options: ["kiyimini", "bo'yini", "yoshini inobatga olishi kerak", "vaznini"],
+                    correct: 2
+                },
+                {
+                    question: "Jismoniy tarbiya darslarida harakatli oʻyinlarning asosiy vazifasi?",
+                    options: ["faqat dam olish", "jismoniy sifatlarni rivojlantirish", "o'quvchilarni charchatish", "vaqtni o'tkazish"],
+                    correct: 1
+                },
+                {
+                    question: "“Qoch bolam kalxat keldi” o‘yini darsning qaysi qismida oʻynash tavsiya etiladi?",
+                    options: ["tayyorlov qismida", "darsning asosiy qismida", "yakunlovchi qismida", "darsdan keyin"],
+                    correct: 1
+                },
+                {
+                    question: "Harakatli oʻyinlarda jamoalar sardori kim ?",
+                    options: ["o'qituvchi", "maktab direktori", "oʻyin ishtirokchisi", "tashqaridan taklif qilingan shaxs"],
+                    correct: 2
+                },
+                {
+                    question: "Darsning tayyorlov qismida qaysi harakatli o‘yinni oʻtkazishni tavsiya etasiz?",
+                    options: ["Arqon tortish", "Lokamotiv", "Chillak", "Qal'a himoyasi"],
+                    correct: 1
+                },
+                {
+                    question: "“Qalʼa himoyasi” oʻyini qaysi sport turiga mos keladi?",
+                    options: ["basketbol", "voleybol", "gandbol", "futbol"],
+                    correct: 2
+                },
+                {
+                    question: "“Arqon tortish” oʻyini qaysi jismoniy sifatni rivojlantiradi?",
+                    options: ["Tezkorlikni", "Egiluvchanlikni", "Chidamlilikni", "kuchni"],
+                    correct: 3
+                },
+                {
+                    question: "Harakatli oʻyinlar asosan qaysi jihati bilan sport oʻyinlaridan farq qiladi?",
+                    options: ["ishtirokchilar soni bilan", "o‘yin qoidalarini o‘zgartirsa bo‘ladi", "o'yin vaqti bilan", "maydon o'lchami bilan"],
+                    correct: 1
+                },
+                {
+                    question: "Harakatli oʻyinlar oʻtkazilganda yordamchilar tayinlash kerakmi?",
+                    options: ["shart emas", "yordamchilar tayinlanishi kerak", "faqat kerak bo'lganda", "o'qituvchining xohishiga bog'liq"],
+                    correct: 1
+                },
+                {
+                    question: "Oʻyin rahbariga qoʻyiladigan talablar?",
+                    options: ["faqat o'yinni boshlash", "oʻyinni tanlash va oʻtkazish", "faqat hisobni yuritish", "faqat tomosha qilish"],
+                    correct: 1
+                },
+                {
+                    question: "Darsning yakunlovchi qismida qaysi oʻyinni oʻtkazish tavsiya etiladi?",
+                    options: ["Arqon tortish", "Estafeta", "“Sinf rostlan”", "Qal'a himoyasi"],
+                    correct: 2
+                },
+                {
+                    question: "Qaysi harakatli oʻyin egiluvchanlik sifatini oshiradi?",
+                    options: ["Arqon tortish", "Panja urish", "Ilgak oyoqlar, Eshak mindi", "Tez joylaringga"],
+                    correct: 2
+                },
+                {
+                    question: "Qaysi harakatli oʻyin chidamlilik sifatini oshiradi?",
+                    options: ["Ilgak oyoqlar", "Panja urish", "Ta'qiqlangan harakat", "Sinf rostlan"],
+                    correct: 1
+                },
+                {
+                    question: "Qisqa masofaga yugurish malakasini oshirishda qanday oʻyinlardan foydalanish kerak?",
+                    options: ["Sekin yurish o'yinlari", "Estafetali harakatli o‘yinlar", "Arqon tortish", "Shaxmat"],
+                    correct: 1
+                },
+                {
+                    question: "“Tez joylaringga” oʻyini qaysi jismoniy sifatni rivojlantirishga yordam beradi?",
+                    options: ["Kuchni", "Chidamlilikni", "Tezkorlikni", "Egiluvchanlikni"],
+                    correct: 2
+                },
+                {
+                    question: "“Kim uzoqqa otadi?” oʻyini yengil atletikaning qaysi elementlarini rivojlantiradi?",
+                    options: ["yugurish", "sakrash", "uloqtirish", "sportcha yurish"],
+                    correct: 2
+                },
+                {
+                    question: "Umumtaʼlim maktablarida 4-sinflarda harakatli oʻyinlar necha soat berilgan?",
+                    options: ["8 soat", "10 soat", "12 soat", "14 soat"],
+                    correct: 2
+                },
+                {
+                    question: "Kurash elementlarini rivojlantiradigan oʻyinni koʻrsating.",
+                    options: ["Mushuk-sichqon", "Oq terakmi, ko'k terak", "Tortib chiziqdan oʻtkaz", "Kim chaqqon"],
+                    correct: 2
+                },
+                {
+                    question: "“Chillak” oʻyini kimlar tomonidan yaratilgan?",
+                    options: ["dehqonlar", "hunarmandlar", "choʻponlar", "ovchilar"],
+                    correct: 2
+                },
+                {
+                    question: "“Lanka”(qarab tep) oʻyini qanday oʻynaladi?",
+                    options: ["qo'l bilan", "bosh bilan", "oyoq bilan", "tayoqcha bilan"],
+                    correct: 2
+                },
+                {
+                    question: "1001 oʻyini kitob muallifi kim?",
+                    options: ["A.Abdullayev", "T.Usmonxoʻjayev, F.Xoʻjayev", "Sh.Normurodov", "K.Yusupov"],
+                    correct: 1
+                },
+                {
+                    question: "“Chavgon” oʻyini kimlar tomonidan yaratilgan?",
+                    options: ["dehqonlar", "sarbozlar", "chavandozlar", "hunarmandlar"],
+                    correct: 2
+                },
+                {
+                    question: "Jismoniy tarbiya darsining yakunlovchi qismida qanday oʻyinlar qoʻllash mumkin?",
+                    options: ["yuqori shiddatli o'yinlar", "tiklovchi shiddati past oʻyinlar", "kuch talab qiladigan o'yinlar", "murakkab qoidali o'yinlar"],
+                    correct: 1
+                }
+            ],
+            "3.7": [
+                {
+                    question: "Yengil atletika sport turi sifatida qachon va qayerda vujudga kelgan?",
+                    options: ["e.a. 550-yilda Rimda", "e.a. 776-yilda Afinada", "e.a. 300-yilda Misrda", "1896-yilda Londonda"],
+                    correct: 1
+                },
+                {
+                    question: "“Atlet” so‘zi qanday ma’noni anglatadi?",
+                    options: ["yuguruvchi", "sakrovchi", "kurashchi", "uloqtiruvchi"],
+                    correct: 2
+                },
+                {
+                    question: "1 stadiy necha metrga teng?",
+                    options: ["100 m", "155 m, 50 sm", "192 m, 27 sm", "200 m"],
+                    correct: 2
+                },
+                {
+                    question: "1 milya necha metrga teng?",
+                    options: ["1000 m", "1500 m", "1609 m", "2000 m"],
+                    correct: 2
+                },
+                {
+                    question: "Yengil atletika necha bo‘limdan iborat?",
+                    options: ["3 ta", "4 ta", "5 ta", "6 ta"],
+                    correct: 2
+                },
+                {
+                    question: "Olimpiyada o‘yinlari dasturiga estafeta yugurishning qanday turi kiritildi?",
+                    options: ["4x100m aralash", "4х400m aralash estafeta", "4x200m", "shvedcha estafeta"],
+                    correct: 1
+                },
+                {
+                    question: "Birinchi zamonaviy Olimpiya o‘yinlari qachon o‘tkazilgan?",
+                    options: ["1892-yil", "1894-yil", "1896-yil", "1900-yil"],
+                    correct: 2
+                },
+                {
+                    question: "Birinchi zamonaviy Olimpiyada o‘yinlari qayerda o‘tkazilgan",
+                    options: ["Parijda", "Londonda", "Afinada", "Stokgolmda"],
+                    correct: 2
+                },
+                {
+                    question: "Respublikamizda jismoniy tarbiya tizimida yengil atletikaning qaysi turlari keng qo‘llaniladi?",
+                    options: ["faqat yugurish", "yugurish, sakrash, uloqtirish", "faqat sakrash va uloqtirish", "ko'pkurash"],
+                    correct: 1
+                },
+                {
+                    question: "Olimpiya o‘yinlari dasturiga sportcha yurishning erkaklar orasida qaysi masofalari kiritilgan?",
+                    options: ["10, 20 km", "20, 30 km", "20, 50 km", "30, 50 km"],
+                    correct: 2
+                },
+                {
+                    question: "Yurishning yugurishdan farqi nimada?",
+                    options: ["Tezlikning pastligi", "Qo'l harakatlarining yo'qligi", "uchish fazasi yo‘qligi va tizzalarning bukilmasligi", "Masofaning qisqaligi"],
+                    correct: 2
+                },
+                {
+                    question: "Yurishga ta’rif bering.",
+                    options: ["sakrab-sakrab harakatlanish", "yurish – insonning bir nuqtadan ikkinchi nuqtaga ko‘chib o‘tishining tabiiy usuli", "tez yugurish usuli", "sekin yugurish usuli"],
+                    correct: 1
+                },
+                {
+                    question: "Sportcha yurish qanday tur hisoblanadi?",
+                    options: ["atsiklik", "siklik", "aralash", "situatsion"],
+                    correct: 1
+                },
+                {
+                    question: "Yuqori malakali sportcha yuruvchilarning yurish tezligi, oddiy yurishdagiga nisbatan necha barobar tez hisoblanadi?",
+                    options: ["1,5-2 marta", "2-2,5 marta", "2,5-3 marta", "3-3,5 marta"],
+                    correct: 1
+                },
+                {
+                    question: "Sportcha yurish musobaqsida sportchi qaysi holatlarda musobaqadan chetlatiladi?",
+                    options: ["sekin yurganida", "yurishdan yugurishga o‘tganda va tizzalar bukilsa", "qo'llarini noto'g'ri harakatlantirganda", "marra chizig'ini noto'g'ri kesib o'tganda"],
+                    correct: 1
+                },
+                {
+                    question: "Yugurish turlari to‘g‘ri berilgan javobni ko‘rsating.",
+                    options: ["faqat qisqa va uzoq", "qisqa, o‘rta, uzoq va o‘ta uzoq masofaga", "faqat marafon", "faqat to'siqlar osha"],
+                    correct: 1
+                },
+                {
+                    question: "Qisqa masofaning qaysi turlari Olimpiya o‘yinlari dasturiga kiritilgan?",
+                    options: ["60, 100, 200 m", "100, 200, 400 m", "200, 400, 800 m", "Barcha javoblar to'g'ri"],
+                    correct: 1
+                },
+                {
+                    question: "Yopiq inshootlardagi jahon chempionatida qisqa masofalarning qaysi turlaridan musobaqalar o‘tkaziladi?",
+                    options: ["60, 100, 200 m", "60, 200, 400 m", "100, 200, 400 m", "50, 100, 200 m"],
+                    correct: 1
+                },
+                {
+                    question: "Stadionlarda yugurish yo‘lagining aylana uzunligi berilgan javobni toping.",
+                    options: ["200 m", "300 m", "400 m", "500 m"],
+                    correct: 2
+                },
+                {
+                    question: "Stadionlarda yugurish yo‘lagining eni qanchaga teng?",
+                    options: ["100 sm", "110 sm", "122 sm", "130 sm"],
+                    correct: 2
+                },
+                {
+                    question: "Erkaklar o‘rtasida 100 m.ga yugurishda jahon rekordi qanchaga teng?",
+                    options: ["9.69 sek", "9.63 sek", "9.58 sek", "9.72 sek"],
+                    correct: 2
+                },
+                {
+                    question: "Erkaklar o‘rtasida 100 m.ga yugurishda jahon rekordi qachon va kim tomonidan o‘rnatilgan?",
+                    options: ["1999-yil Maykl Jonson", "2005-yil Asafa Pauell", "2009-yil Usayn Bolt", "2012-yil Yohan Bleyk"],
+                    correct: 2
+                },
+                {
+                    question: "Startning nechta turi bor?",
+                    options: ["Faqat pastki", "Pastki va yuqori", "Faqat yuqori", "Uchta"],
+                    correct: 1
+                },
+                {
+                    question: "Pastki startga turishning nechta usuli bor?",
+                    options: ["1 ta", "2 ta", "3 ta", "4 ta"],
+                    correct: 2
+                },
+                {
+                    question: "Start tirgaklarining joylashuviga qarab nechta usuli mavjud?",
+                    options: ["oddiy, yaqinlashtirilgan", "uzaytirilgan, yaqinlashtirilgan", "oddiy, uzaytirilgan, yaqinlashtirilgan", "faqat oddiy"],
+                    correct: 2
+                },
+                {
+                    question: "Qisqa masofaga yugurishda yuqori tezlikni ta’minlovchi omillar qaysilar?",
+                    options: ["faqat qadamlar uzunligi", "faqat qadamlar chastotasi", "qadamlar uzunligi va chastotasi", "qo'l harakatlari"],
+                    correct: 2
+                }
+            ],
+            "3.8": [
+                {
+                    question: "2022-yil 11-apreldagi PQ-201-son qarorida 2022-yildan boshlab har yili an’anaviy tarzda 30-iyun — O‘zbekiston Respublikasi yoshlari kuni hamda dekabr oyida o‘tkaziladigan “Yoshlar forumi” doirasida sportning futbol, mini-futbol, voleybol, yengil atletika, shaxmat, shashka, stol tennisi, stritbol, “workaut” turlari bo‘yicha besh bosqichli ommaviy sport musobaqalarini o‘tkazish tizimi necha bosqichda joriy etildi?",
+                    options: ["Uch bosqichli", "To'rt bosqichli", "besh bosqichli “Besh tashabbus olimpiadasi” doirasida o‘tkaziladi", "Olti bosqichli"],
+                    correct: 2
+                },
+                {
+                    question: "Besh bosqichli ommaviy sport musobaqalarini o‘tkazish tizimining birinchi bosqichini ko‘rsating?",
+                    options: ["maktab musobaqalari", "tuman musobaqalari", "sektor musobaqalari", "ko‘chalararo mahalla musobaqalari"],
+                    correct: 3
+                },
+                {
+                    question: "Besh bosqichli ommaviy sport musobaqalarini o‘tkazish tizimining beshinchi bosqichini ko‘rsating?",
+                    options: ["Tuman finali", "Viloyat finali", "viloyat musobaqalarida g‘olib bo‘lgan mahalla jamoalari o‘rtasida respublika (final) musobaqalari", "Xalqaro musobaqalar"],
+                    correct: 2
+                },
+                {
+                    question: "2022-yil 11-apreldagi PQ-201-son Qarorida 2023-yil 1-martdan boshlab olimpiya, noolimpiya va milliy sport turlari bo‘yicha nechi bosqichli umumrespublika sport musobaqalarini o‘tkazish tizimi joriy qilinadi?",
+                    options: ["ikki bosqichli", "uch bosqichli", "to'rt bosqichli", "besh bosqichli"],
+                    correct: 1
+                },
+                {
+                    question: "Amaliyotda “Besh tashabbus olimpiadasi” hamda olimpiya, noolimpiya va milliy sport turlari bo‘yicha uch bosqichli umumrespublika sport musobaqalari davomida g‘olib va sovrindorlarni (1-3 o‘rin) tayyorlagan umumiy o‘rta ta’lim maktablarining jismoniy tarbiya fani o‘qituvchilari va sport-ta’lim muassasalarining trenerlariga qanday imtiyozlar berilgan?",
+                    options: ["pul mukofoti beriladi", "malaka attestatsiyasiga jalb etilmaydi va ularga malaka toifalari to‘g‘ridan to‘g‘ri beriladi", "navbatdan tashqari ta'til beriladi", "faxriy yorliq bilan taqdirlanadi"],
+                    correct: 1
+                },
+                {
+                    question: "Mamlakat prezidentining PQ-201-son qarorida 2022/2023 o‘quv yilidan boshlab umumiy o‘rta ta’lim maktablarida yoshlarning qiziqishlari, talab va istaklaridan kelib chiqqan holda, jismoniy tarbiya fani o‘qituvchilari hamda kimlar tomonidan qancha sport turlaridan to‘garaklar faoliyatitni tashkil etish nazarda tutilgan?",
+                    options: ["faqat jismoniy tarbiya fani o'qituvchilari tomonidan", "jismoniy tarbiya fani o‘qituvchilari hamda taniqli va faxriy sportchilar tomonidan kamida 1 ta sport turi bo‘yicha to‘garaklar faoliyatini tashkil etish", "faqat trenerlar tomonidan", "ota-onalar tomonidan"],
+                    correct: 1
+                },
+                {
+                    question: "Qaysi usulda yoshlar guruhlarga bo‘linadilar, har bir guruh o‘qituvchi topshirig‘iga binoan mustaqil shug‘ullanadi?",
+                    options: ["frontal usulda", "o'yin usulida", "guruhli usulda", "individual usulda"],
+                    correct: 2
+                },
+                {
+                    question: "... usulda - barcha yoshlar mashqlarni bir vaqtda bajaradilar. Uning ustunligi ko‘proq yoshlarni qamrab olishda, darsda yuqori zichlikka va katta jismoniy yuklamaga erishilishidadir.",
+                    options: ["guruhli usulda", "frontal usulda", "musobaqa usulida", "aylanma usulda"],
+                    correct: 1
+                },
+                {
+                    question: "... - yoshlarning aqliy ish qobiliyatlari va oldilarida turgan o‘quv faoliyatlariga istak bildirishi hamda badan a’zolarida salbiy siljishlarni ogohlantirish, uzoq vaqt harakatsizlikda bo‘lgan vaziyatni yo‘qotishga yordam beradi.",
+                    options: ["jismoniy mashq daqiqalari", "darsgacha gimnastika mashqlari", "darsdan keyingi mashg'ulotlar", "uy vazifasi"],
+                    correct: 1
+                },
+                {
+                    question: "Jismoniy mashq daqiqalarining maqsadi nima?",
+                    options: ["Yangi bilimlarni o'rganish", "hordiq chiqarish, yoshlar ish qobiliyatini oshirish", "Intizomni mustahkamlash", "Faqat o'yin o'ynash"],
+                    correct: 1
+                },
+                {
+                    question: "PQ-201-son qarorida musobaqalarning respublika bosqichida g‘olib va sovrindor bo‘lgan mahalla terma jamoasini tayyorlagan jismoniy tarbiya fani o‘qituvchilari va trenerlarni rag‘batlantirish sifatida qanday rag‘batlantirishlar nazarda tutilgan?",
+                    options: ["pul mukofoti", "malaka toifasini oshirish", "navbatdan tashqari attestatsiya", "barcha javoblar to‘g‘ri"],
+                    correct: 3
+                },
+                {
+                    question: "Sport turlari bo‘yicha musobaqa amaliyotida musobaqa o‘tkazishning qanday usullari qo‘laniladi?",
+                    options: ["aylanma", "chetdan chiqib ketish", "aralash", "barcha javob to‘g‘ri"],
+                    correct: 3
+                },
+                {
+                    question: "Kishining jismoniy taraqqiyot (rivojlanish) darajasini oshirish uchun maxsus tanlangan harakatlar nima deyiladi?",
+                    options: ["Mehnat faoliyati", "jismoniy mashqlar", "Dam olish", "O'yinlar"],
+                    correct: 1
+                },
+                {
+                    question: "Dars va darsdan tashqari jismoniy tarbiya va sport mashg‘ulotlarida qatnashuvchilarining qanday individual holatlariga e’tibor beriladi?",
+                    options: ["faqat yoshi va jinsiga", "faqat salomatligiga", "yoshi, jinsi, salomatligi, jismoniy rivojlanishi, tayyorgarlik saviyasi, aqliy, jismoniy, xissiy (emotsiya) va boshqa holatlariga", "faqat tayyorgarlik saviyasiga"],
+                    correct: 2
+                }
+            ],
+            "3.9": [
+                {
+                    question: "Qadimgi Olimpiya o‘yinlari qachon o‘tkazilgan?",
+                    options: ["e.a. 776-yil", "e.a. 550-yil", "e.a. 1-yil", "milodiy 394-yil"],
+                    correct: 0
+                },
+                {
+                    question: "Qadimgi Olimpiya o‘yinlari qayerda o‘tkazilgan?",
+                    options: ["Rim", "Misr", "Gretsiya (Afina)", "Sparta"],
+                    correct: 2
+                },
+                {
+                    question: "Bir stadiy necha metrga teng?",
+                    options: ["100 m", "192 m. 27 sm", "200 m", "400 m"],
+                    correct: 1
+                },
+                {
+                    question: "“Stadiy” so‘zidan qanday so‘z kelib chiqan?",
+                    options: ["“Start”", "“Stadion”", "“Statistika”", "“Standart”"],
+                    correct: 1
+                },
+                {
+                    question: "Qadimgi Olimpiya o‘yinlarining g‘oliblari qanday nomlangan?",
+                    options: ["Gladiator", "Chempion", "Olimpionik", "Atlet"],
+                    correct: 2
+                },
+                {
+                    question: "Qadimgi Olimpiya o‘yinlarida kimlar ishtirok etishi mumkin edi?",
+                    options: ["Faqat erkaklar", "Barcha greklar", "Ozod grek fuqarolari", "Faqat sportchilar"],
+                    correct: 2
+                },
+                {
+                    question: "Zamonaviy Olimpiya o‘yinlari asoschisi kim?",
+                    options: ["Dimetrus Vikelis", "Per de Kuberten", "Xuan Antonio Samaranch", "Tomas Bax"],
+                    correct: 1
+                },
+                {
+                    question: "Per de Kuberten Sorbonna universitetida qanday ma’ruza bilan ishtirok etgan?",
+                    options: ["“Sport va salomatlik”", "“Olimpizmning uyg‘onishi”", "“Tinchlik va sport”", "“Zamonaviy o'yinlar”"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasi qachon tashkil topgan?",
+                    options: ["1896-yil 6-aprel", "1894-yil 23-iyun", "1900-yil 1-yanvar", "1992-yil 21-yanvar"],
+                    correct: 1
+                },
+                {
+                    question: "23-iyun sanasi har yili butun dunyoda qanday bayram nishonlanadi?",
+                    options: ["“Sport kuni”", "“Olimpiya kuni”", "“Salomatlik kuni”", "“Chempionlar kuni”"],
+                    correct: 1
+                },
+                {
+                    question: "Birinchi zamonaviy Olimpiya o‘yinlari qachon va qayerda o‘tkazilgan?",
+                    options: ["Fransiya (Parij) 1900-yil", "Gretsiya (Afina) 1896-yil", "AQSH (Sent-Luis) 1904-yil", "Buyuk Britaniya (London) 1908-yil"],
+                    correct: 1
+                },
+                {
+                    question: "Birinchi zamonaviy Olimpiya o‘yinlarida nechta sport turidan o‘tkazilgan?",
+                    options: ["7 ta", "9 ta", "11 ta", "13 ta"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasining birinchi Prezidenti kim bo‘lgan?",
+                    options: ["Per de Kuberten", "Dimetrus Vikelis", "Anri de Baye-Latur", "Zigfrid Edstryom"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasining ikkinchi Prezidenti kim?",
+                    options: ["Dimetrus Vikelis", "Per de Kuberten", "Tomas Bax", "Xuan Antonio Samaranch"],
+                    correct: 1
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasini eng ko‘p boshqargan Prezidenti kim bo‘lgan?",
+                    options: ["Xuan Antonio Samaranch", "Eyveri Brendej", "Per de Kuberten", "Tomas Bax"],
+                    correct: 2
+                },
+                {
+                    question: "Olimpiya o‘yinlari shiorini ketma-ketligini aniqlang?",
+                    options: ["Tezroq, kuchliroq, balandroq", "Balandroq, tezroq, birgalikda", "tezroq, balandroq, kuchliroq, birgalikda", "Kuchliroq, birgalikda, tezroq"],
+                    correct: 2
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasi shtab-kvartirasi qaysi davlatda joylashgan?",
+                    options: ["Fransiya (Parij)", "Gretsiya (Afina)", "Shvetsariya (Lozanna)", "AQSH (Nyu-York)"],
+                    correct: 2
+                },
+                {
+                    question: "Xalqaro Olimpiya qo‘mitasini hozirda boshqarib kelayotgan Prezident kim?",
+                    options: ["Jak Rogge", "Xuan Antonio Samaranch", "Tomas Bax", "Lord Killanin"],
+                    correct: 2
+                },
+                {
+                    question: "VI, XII, XIII Olimpiyada o‘yinlari nima sababdan o‘tkazilmagan?",
+                    options: ["moliyaviy muammolar sababli", "jahon urushlari sababli", "sportchilarning tayyor emasligi sababli", "tabiiy ofatlar sababli"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston Milliy Olimpiya qo‘mitasi qachon tashkil topgan?",
+                    options: ["1991-yil 1-sentabr", "1992-yil 21-yanvar", "1993-yil sentabr", "1996-yil 1-may"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston Milliy Olimpiya qo‘mitasi qaysi yili Xalqaro Olimpiya qo‘mitasiga a’zo bo‘lgan?",
+                    options: ["1992-yil", "1993-yil sentabr", "1994-yil", "1995-yil"],
+                    correct: 1
+                },
+                {
+                    question: "O‘zbekiston Milliy Olimpiya qo‘mitasining birinchi Prezidenti kim bo‘lgan?",
+                    options: ["Alisher Usmonov", "Salim Abduvaliyev", "Obid Nazirovich Nazirov", "Rustam Shoabdurahmonov"],
+                    correct: 2
+                },
+                {
+                    question: "O‘zbekiston Olimpiya shon-shuhrat muzeyi qachon tashkil topgan?",
+                    options: ["1992-yil", "1994-yil", "1996-yil", "1998-yil"],
+                    correct: 2
+                },
+                {
+                    question: "XXXI-Rio-de-Janeyro yozgi Olimpiya o‘yinlarida O‘zbekiston sportchilari nechanchi o‘rinni egallashgan?",
+                    options: ["15-o'rinni", "18-o'rinni", "21-o‘rinni", "25-o'rinni"],
+                    correct: 2
+                },
+                {
+                    question: "XXXII-Tokio yozgi Olimpiya o‘yinlarida O‘zbekiston sportchilari nechanchi o‘rinni egallashgan?",
+                    options: ["28-o'rinni", "30-o'rinni", "32-o‘rinni", "35-o'rinni"],
+                    correct: 2
+                },
+                {
+                    question: "2016-yil Rio-de-Janeyroda bo‘lib o‘tgan yozgi Olimpiya o‘yinlarida O‘zbekiston nechta medalni qo‘lga kiritishgan?",
+                    options: ["10 ta", "11 ta", "13 ta", "15 ta"],
+                    correct: 2
+                },
+                {
+                    question: "2020-yil Tokio Olimpiya o‘yinlarida O‘zbekiston nechta medalni qo‘lga kiritishgan?",
+                    options: ["3 ta", "4 ta", "5 ta", "6 ta"],
+                    correct: 2
+                },
+                {
+                    question: "Rio-de-Janeyro Olimpiada o‘yinlarida O‘zbekistonga kimlar oltin medal keltirgan?",
+                    options: ["Faqat X. Do‘smatov", "X. Do‘smatov, S. Zoirov, F. G‘oibnazarov", "R. Nuriddinov, F. G'oibnazarov", "S. Zoirov, R. Nuriddinov"],
+                    correct: 1
+                },
+                {
+                    question: "Tokio Olimpiada o‘yinlarida O‘zbekistonga kimlar oltin medal keltirgan?",
+                    options: ["Ulugʻbek Rashitov, Akbar Joʻrayev, Bahodir Jalolov", "Faqat B. Jalolov", "A. Jo'rayev, D. Bobonov", "U. Rashitov, B. Isroilov"],
+                    correct: 0
+                },
+                {
+                    question: "XXXIII yozgi Olimpiya o‘yinlari qaysi shaharda bo‘lib o‘tadi?",
+                    options: ["AQSH (Los-Andjeles)", "Avstraliya (Brisben)", "Fransiya (Parij)", "Yaponiya (Tokio)"],
+                    correct: 2
+                },
+                {
+                    question: "XXXIV yozgi Olimpiya o‘yinlari qaysi shaharda bo‘lib o‘tadi?",
+                    options: ["Fransiya (Parij)", "(AQSH) Los-Andjeles", "Avstraliya (Brisben)", "Germaniya (Berlin)"],
+                    correct: 1
+                }
+            ]
+        };
+
+
+        let currentModule = "1.1";
+
+        function loadModule() {
+            currentModule = document.getElementById('moduleSelect').value;
+            displayQuestions();
+            resetTest();
+        }
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsContainer');
+            const questions = testData[currentModule];
+            
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question" id="question${index}">
+                    <div class="question-text">${index + 1}. ${q.question}</div>
+                    <div class="options">
+                        ${q.options.map((option, optIndex) => `
+                            <div class="option" id="q${index}opt${optIndex}">
+                                <input type="radio" name="q${index}" id="q${index}_${optIndex}" value="${optIndex}">
+                                <label for="q${index}_${optIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function checkAnswers() {
+            const questions = testData[currentModule];
+            let correct = 0;
+            let answered = 0;
+
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                
+                if (selected) {
+                    answered++;
+                    const selectedValue = parseInt(selected.value);
+                    const optionDiv = document.getElementById(`q${index}opt${selectedValue}`);
+                    
+                    if (selectedValue === q.correct) {
+                        correct++;
+                        optionDiv.classList.add('correct');
+                    } else {
+                        optionDiv.classList.add('incorrect');
+                        document.getElementById(`q${index}opt${q.correct}`).classList.add('correct');
+                    }
+                }
+            });
+
+            const percentage = answered > 0 ? Math.round((correct / questions.length) * 100) : 0;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = `
+                <div>Результаты теста</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-value">${correct}/${questions.length}</span>
+                        <div>Правильных ответов</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${percentage}%</span>
+                        <div>Процент</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${answered}</span>
+                        <div>Отвечено</div>
+                    </div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        function resetTest() {
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+                input.disabled = false;
+            });
+            
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        window.onload = function() {
+            displayQuestions();
+        };
+    </script>
+</body>
+</html>
